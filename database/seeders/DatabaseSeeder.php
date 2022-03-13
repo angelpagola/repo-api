@@ -14,6 +14,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        //Todo: Nivel 0
+        $this->call(FacultadSeeder::class);
+        $this->call(CicloSeeder::class);
+        $this->call(TagSeeder::class);
+
+        //Todo: Nivel 1
+        $this->call(EscuelaSeeder::class);
+
+        //Todo: Nivel 2
+        \App\Models\Estudiante::factory(9)->create();
+        \App\Models\Curso::factory(12)->create();
+
+        //Todo: Nivel 3
+        $this->call(UsuarioSeeder::class);
+        \App\Models\Proyecto::factory(20)->create();
+
+        //Todo: Nivel 4
+        \App\Models\ProyectoTag::factory(20)->create();
+        \App\Models\Favorito::factory(5)->create();
+
     }
 }
