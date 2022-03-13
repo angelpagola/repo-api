@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\CursoController;
+use App\Http\Controllers\FavoritoController;
+use App\Http\Controllers\ProyectoController;
+use App\Http\Controllers\UsuarioController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,4 +20,25 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+
+Route::prefix('/usuario')->controller(UsuarioController::class)->group(function () {
+    Route::get('/', 'index')->name('usuario.index');
+    Route::get('/{id}', 'show')->name('usuario.show');
+});
+
+Route::prefix('/curso')->controller(CursoController::class)->group(function () {
+    Route::get('/', 'index')->name('curso.index');
+    Route::get('/{id}', 'show')->name('curso.show');
+});
+
+Route::prefix('/proyecto')->controller(ProyectoController::class)->group(function () {
+    Route::get('/', 'index')->name('proyecto.index');
+    Route::get('/{id}', 'show')->name('proyecto.show');
+});
+
+Route::prefix('/favorito')->controller(FavoritoController::class)->group(function () {
+    Route::get('/', 'index')->name('favorito.index');
+    Route::get('/{id}', 'show')->name('favorito.show');
 });
