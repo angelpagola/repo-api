@@ -15,8 +15,6 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         //Todo: Nivel 0
-        $this->call(FacultadSeeder::class);
-        $this->call(CicloSeeder::class);
         $this->call(TagSeeder::class);
 
         //Todo: Nivel 1

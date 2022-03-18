@@ -28,11 +28,6 @@ Route::prefix('/usuario')->controller(UsuarioController::class)->group(function 
     Route::get('/{id}', 'show')->name('usuario.show');
 });
 
-Route::prefix('/curso')->controller(CursoController::class)->group(function () {
-    Route::get('/', 'index')->name('curso.index');
-    Route::get('/{id}', 'show')->name('curso.show');
-});
-
 Route::prefix('/proyecto')->controller(ProyectoController::class)->group(function () {
     Route::get('/', 'index')->name('proyecto.index');
     Route::get('/{id}', 'show')->name('proyecto.show');
