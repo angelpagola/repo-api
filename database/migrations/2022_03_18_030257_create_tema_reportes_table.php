@@ -12,13 +12,15 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create('usuarios', function (Blueprint $table) {
+        Schema::create('tema_reportes', function (Blueprint $table) {
             $table->id();
-            $table->string('uuid', 40);
-            $table->string('usuario', 25);
-            $table->string('password', 65);
-            $table->boolean('activo')->default('1');
-            $table->foreignId('estudiante_id')->constrained('estudiantes')
+            $table->foreignId('motivo_id')->constrained('motivos')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+            $table->foreignId('usuario_id')->constrained('usuarios')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+            $table->foreignId('proyecto_id')->constrained('proyectos')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
         });
@@ -31,6 +33,6 @@ return new class extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('usuarios');
+        Schema::dropIfExists('tema_reportes');
     }
 };

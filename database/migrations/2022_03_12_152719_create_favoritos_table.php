@@ -15,7 +15,7 @@ return new class extends Migration {
         Schema::create('favoritos', function (Blueprint $table) {
             $table->id();
             $table->date('fecha_agregacion');
-            $table->foreignId('estudiante_id')->constrained('estudiantes')
+            $table->foreignId('usuario_id')->constrained('usuarios')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
             $table->foreignId('proyecto_id')->constrained('proyectos')
