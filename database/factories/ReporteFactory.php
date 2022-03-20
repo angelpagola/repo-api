@@ -2,14 +2,15 @@
 
 namespace Database\Factories;
 
+use App\Models\Motivo;
 use App\Models\Proyecto;
 use App\Models\Usuario;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Favorito>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Reporte>
  */
-class FavoritoFactory extends Factory
+class ReporteFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -19,9 +20,9 @@ class FavoritoFactory extends Factory
     public function definition()
     {
         return [
-            'fecha_agregacion' => $this->faker->dateTimeBetween('-4 months', 'now')->format("Y-m-d"),
-            'proyecto_id' => Proyecto::inRandomOrder()->first()->id,
+            'motivo_id' => Motivo::inRandomOrder()->first()->id,
             'usuario_id' => Usuario::inRandomOrder()->first()->id,
+            'proyecto_id' => Proyecto::inRandomOrder()->first()->id
         ];
     }
 }

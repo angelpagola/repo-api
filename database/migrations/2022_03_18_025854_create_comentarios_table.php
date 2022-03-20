@@ -12,11 +12,9 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create('tema_reportes', function (Blueprint $table) {
+        Schema::create('comentarios', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('motivo_id')->constrained('motivos')
-                ->cascadeOnUpdate()
-                ->cascadeOnDelete();
+            $table->string('mensaje', 200);
             $table->foreignId('usuario_id')->constrained('usuarios')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
@@ -33,6 +31,6 @@ return new class extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('tema_reportes');
+        Schema::dropIfExists('tema_comentarios');
     }
 };

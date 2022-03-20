@@ -12,4 +12,9 @@ class ProyectoImagen extends Model
     protected $table = 'proyecto_imagenes';
     public $timestamps = false;
     public $fillable = ['link_imagen', 'proyecto_id'];
+
+    public function proyecto()
+    {
+        return $this->belongsTo(Proyecto::class);
+    }
 }

@@ -19,11 +19,11 @@ class ProyectoFactory extends Factory
     public function definition()
     {
         return [
-            'titulo' => $this->faker->sentence(20),
+            'uuid' => $this->faker->uuid,
+            'titulo' => $this->faker->sentence(10),
             'resumen' => $this->faker->paragraph() . " " . $this->faker->paragraph(),
             'fecha_publicacion' => $this->faker->dateTimeBetween('-6 months', 'now')->format("Y-m-d"),
             'estudiante_id' => Estudiante::inRandomOrder()->first()->id,
-            'curso_id' => Curso::inRandomOrder()->first()->id
         ];
     }
 }

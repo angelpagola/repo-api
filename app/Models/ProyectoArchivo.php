@@ -12,4 +12,9 @@ class ProyectoArchivo extends Model
     protected $table = 'proyecto_archivos';
     public $timestamps = false;
     public $fillable = ['link_archivo', 'proyecto_id'];
+
+    public function proyecto()
+    {
+        return $this->belongsTo(Proyecto::class);
+    }
 }

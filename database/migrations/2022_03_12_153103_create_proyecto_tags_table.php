@@ -12,7 +12,7 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create('proyecto_tag', function (Blueprint $table) {
+        Schema::create('proyecto_tags', function (Blueprint $table) {
             $table->id();
             $table->foreignId('proyecto_id')->constrained('proyectos')
                 ->cascadeOnUpdate()

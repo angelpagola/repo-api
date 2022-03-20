@@ -7,9 +7,9 @@ use App\Models\Usuario;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Favorito>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Comentario>
  */
-class FavoritoFactory extends Factory
+class ComentarioFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -19,9 +19,9 @@ class FavoritoFactory extends Factory
     public function definition()
     {
         return [
-            'fecha_agregacion' => $this->faker->dateTimeBetween('-4 months', 'now')->format("Y-m-d"),
-            'proyecto_id' => Proyecto::inRandomOrder()->first()->id,
+            'mensaje' => $this->faker->sentence(1, 10),
             'usuario_id' => Usuario::inRandomOrder()->first()->id,
+            'proyecto_id' => Proyecto::inRandomOrder()->first()->id
         ];
     }
 }

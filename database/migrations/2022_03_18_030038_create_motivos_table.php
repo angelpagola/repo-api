@@ -13,15 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('valoracion', function (Blueprint $table) {
+        Schema::create('motivos', function (Blueprint $table) {
             $table->id();
-            $table->boolean('like');
-            $table->foreignId('usuario_id')->constrained('usuarios')
-                ->cascadeOnUpdate()
-                ->cascadeOnDelete();
-            $table->foreignId('proyecto_id')->constrained('proyectos')
-                ->cascadeOnUpdate()
-                ->cascadeOnDelete();
+            $table->string('nombre', 50);
         });
     }
 
@@ -32,6 +26,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('valoracion');
+        Schema::dropIfExists('tema_motivos');
     }
 };

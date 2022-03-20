@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Favorito extends Model
+class Comentario extends Model
 {
     use HasFactory;
 
-    protected $table = 'favoritos';
+    protected $table = 'comentarios';
     public $timestamps = false;
-    public $fillable = ['fecha_agregacion', 'usuario_id', 'proyecto_id'];
+    public $fillable = ['mensaje', 'usuario_id', 'proyecto_id'];
 }

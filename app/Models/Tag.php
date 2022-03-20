@@ -15,7 +15,11 @@ class Tag extends Model
 
     public function proyecto()
     {
-        return $this->belongsToMany(Proyecto::class);
+        return $this->belongsToMany(Proyecto::class, 'proyecto_tags');
     }
 
+    public function usuario()
+    {
+        return $this->belongsToMany(Usuario::class, 'tema_interes');
+    }
 }
