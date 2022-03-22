@@ -31,6 +31,9 @@ Route::prefix('/usuario')->controller(UsuarioController::class)->group(function 
 Route::prefix('/proyecto')->controller(ProyectoController::class)->group(function () {
     Route::get('/', 'index')->name('proyecto.index');
     Route::get('/{id}', 'show')->name('proyecto.show');
+    Route::post('/', 'store')->name('proyecto.store');
+    Route::put('/{id}', 'update')->name('proyecto.update');
+    Route::delete('/{id}', 'destroy')->name('proyecto.destroy');
 });
 
 Route::prefix('/favorito')->controller(FavoritoController::class)->group(function () {

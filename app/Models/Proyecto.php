@@ -24,6 +24,16 @@ class Proyecto extends Model
         return $this->belongsToMany(Tag::class, 'proyecto_tags');
     }
 
+    public function proyectoImagen()
+    {
+        return $this->hasMany(ProyectoImagen::class);
+    }
+
+    public function proyectoArchivo()
+    {
+        return $this->hasMany(ProyectoArchivo::class);
+    }
+
     public function valoracion()
     {
         return $this->belongsToMany(Usuario::class, 'valoraciones');
