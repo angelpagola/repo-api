@@ -2,17 +2,47 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\storeProyecto;
+use App\Http\Requests\updateProyecto;
 use App\Models\Proyecto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class ProyectoController extends Controller
 {
-    public function index()
+    public function indexG()
     {
         $proyecto = Proyecto::query()
-            ->with('estudiante', 'tag', 'proyectoImagen', 'proyectoArchivo')
-            ->get();
+            ->with('estudiante', 'tag', 'proyectoImagen')
+            ->get()->random(2);
+        return response()->json($proyecto, 200);
+    }
+
+    public function index(Request $request)
+    {
+        if ($request->has('buscar')) {
+            if (is_null($request->buscar)) {
+                $proyecto = Proyecto::query()
+                    ->with('estudiante', 'tag', 'proyectoImagen')
+                    ->get()->random(2);
+            } else {
+                $proyecto = Proyecto::query()
+                    ->with('estudiante', 'tag', 'proyectoImagen')
+                    ->where('titulo', 'like', '%' . $request->buscar . '%')
+                    ->orWhereHas('estudiante', function ($query) use ($request) {
+                        return $query->where('nombres', 'like', '%' . $request->buscar . '%');
+                    })
+                    ->orWhereHas('tag', function ($query) use ($request) {
+                        return $query->where('nombre', 'like', '%' . $request->buscar . '%');
+                    })
+                    ->get();
+            }
+        } else {
+            $proyecto = Proyecto::query()
+                ->with('estudiante', 'tag', 'proyectoImagen')
+                ->get()->random(2);
+        }
+
         return response()->json($proyecto, 200);
     }
 
@@ -22,55 +52,41 @@ class ProyectoController extends Controller
             ->with('estudiante', 'tag', 'proyectoImagen', 'proyectoArchivo')
             ->find($id);
         if (is_null($proyecto)) {
-            return response()->json(['message' => 'Project Not Found'], 404);
+            return response()->json(['mensaje' => 'Proyecto No Econtrado'], 404);
         }
         return response()->json($proyecto, 200);
     }
 
-    public function store(Request $request)
+    public function store(storeProyecto $request)
     {
-        /*$request->validate([
-            'titulo' => 'requerid|max:200',
-            'resumen' => 'requerid|max:1000',
-            'fecha_publicacion' => 'requerid|date',
-            'estudiante_id' => 'required|integer|gt:0',
-        ]);
-
-        Proyecto::create([
-            'uuid' => Str::uuid(),
-            'titulo' => $request->titulo,
-            'resumen' => $request->resumen,
-            'fecha_publicacion' => $request->fecha_publicacion,
-            'estudiante_id' => $request->estudiante_id,
-        ]);*/
-
         $proyecto = new Proyecto();
         $proyecto->uuid = Str::uuid();
         $proyecto->titulo = $request->titulo;
         $proyecto->resumen = $request->resumen;
         $proyecto->fecha_publicacion = $request->fecha_publicacion;
         $proyecto->estudiante_id = $request->estudiante_id;
-
         $proyecto->save();
 
-        return response()->json($proyecto, 201);
+        return response()->json([
+            'respuesta' => true,
+            'mensaje' => 'Registro Creado Correctamente'
+        ], 201);
     }
 
-    public function update(Request $request, $id)
+    public function update(updateProyecto $request, Proyecto $proyecto)
     {
-        $proyecto = Proyecto::findOrFail($id)
-            ->update($request->all());
-        if (is_null($proyecto)) {
-            return response()->json(['message' => 'Project Not Found'], 404);
-        }
-        return response()->json($proyecto, 200);
+        $proyecto->update($request->all());
+        return response()->json([
+            'respuesta' => true,
+            'mensaje' => 'Registro Actualizado Correctamente'
+        ], 201);
     }
 
     public function destroy($id)
     {
         $proyecto = Proyecto::destroy($id);
         if (is_null($proyecto)) {
-            return response()->json(['message' => 'Project Not Found'], 404);
+            return response()->json(['mensaje' => 'Proyecto No Encontrado'], 404);
         }
         return response()->json(null, 204);
     }

@@ -13,6 +13,8 @@ class Usuario extends Model
     public $timestamps = false;
     public $fillable = ['uuid', 'usuario', '´password', 'activo', 'estudiante_id'];
 
+    protected $hidden = ['uuid', 'password', 'activo'];
+
     public function estudiante()
     {
         return $this->belongsTo(Estudiante::class);
