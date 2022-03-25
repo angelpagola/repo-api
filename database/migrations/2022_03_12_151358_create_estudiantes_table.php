@@ -20,7 +20,7 @@ return new class extends Migration {
             $table->string('correo', 100)->unique();
             $table->string('telefono', 9)->unique();
             $table->string('linkedin', 100)->unique();
-            $table->string('foto')->nullable();
+            $table->string('avatar')->nullable();
             $table->foreignId('escuela_id')->constrained('escuelas')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();

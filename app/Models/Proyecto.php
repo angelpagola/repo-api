@@ -15,8 +15,7 @@ class Proyecto extends Model
 
     public function estudiante()
     {
-        return $this->belongsTo(Estudiante::class)
-            ->with('escuela');
+        return $this->belongsTo(Estudiante::class);
     }
 
     public function tag()

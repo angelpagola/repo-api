@@ -29,21 +29,21 @@ class DatabaseSeeder extends Seeder
         $this->call(MotivoSeeder::class);
 
         //Todo: Nivel 1
-        \App\Models\Estudiante::factory(5)->create();
+        \App\Models\Estudiante::factory(10)->create();
 
         //Todo: Nivel 2
         $this->call(UsuarioSeeder::class);
-        \App\Models\Proyecto::factory(5)->create();
+        \App\Models\Proyecto::factory(20)->create();
 
         //Todo: Nivel 3
-        \App\Models\ProyectoTag::factory(10)->create();
-        \App\Models\ProyectoImagen::factory(10)->create();
-        \App\Models\ProyectoArchivo::factory(10)->create();
-        \App\Models\Valoracion::factory(3)->create();
-        \App\Models\Favorito::factory(3)->create();
-        \App\Models\TemaInteres::factory(5)->create();
-        \App\Models\Comentario::factory(2)->create();
-        \App\Models\Reporte::factory(1)->create();
+        \App\Models\ProyectoTag::factory(50)->create();
+        \App\Models\ProyectoImagen::factory(30)->create();
+        \App\Models\ProyectoArchivo::factory(30)->create();
+        \App\Models\Valoracion::factory(10)->create();
+        \App\Models\Favorito::factory(10)->create();
+        \App\Models\TemaInteres::factory(10)->create();
+        \App\Models\Comentario::factory(5)->create();
+        \App\Models\Reporte::factory(2)->create();
 
     }
 }
