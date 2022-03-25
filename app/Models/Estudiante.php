@@ -11,11 +11,20 @@ class Estudiante extends Model
 
     protected $table = 'estudiantes';
     public $timestamps = false;
-    public $fillable = ['nombres', 'apellidos', 'correo', 'telefono', 'foto', 'escuela_id'];
+    public $fillable = ['uuid', 'nombres', 'apellidos', 'correo', 'telefono', 'linkedin', 'avatar', 'escuela_id'];
 
     public function escuela()
     {
-        return $this->belongsTo(Escuela::class)
-            ->with('facultad');
+        return $this->belongsTo(Escuela::class);
+    }
+
+    public function usuario()
+    {
+        return $this->hasOne(Usuario::class);
+    }
+
+    public function proyecto()
+    {
+        return $this->hasMany(Proyecto::class);
     }
 }

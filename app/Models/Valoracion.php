@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Facultad extends Model
+class Valoracion extends Model
 {
     use HasFactory;
 
-    protected $table = 'facultades';
+    protected $table = 'valoraciones';
     public $timestamps = false;
-    public $fillable = ['nombre', 'abrev'];
+    public $fillable = ['like', 'usuario_id', 'proyecto_id'];
 
 }

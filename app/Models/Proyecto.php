@@ -11,22 +11,45 @@ class Proyecto extends Model
 
     protected $table = 'proyectos';
     public $timestamps = false;
-    public $fillable = ['titulo', 'resumen', 'fecha_publicacion', 'estudiante_id', 'curso_id'];
+    public $fillable = ['uuid', 'titulo', 'resumen', 'fecha_publicacion', 'estudiante_id'];
 
     public function estudiante()
     {
-        return $this->belongsTo(Estudiante::class)
-            ->with('escuela');
-    }
-
-    public function curso()
-    {
-        return $this->belongsTo(Curso::class)
-            ->with('escuela', 'ciclo');
+        return $this->belongsTo(Estudiante::class);
     }
 
     public function tag()
     {
-        return $this->belongsToMany(Tag::class);
+        return $this->belongsToMany(Tag::class, 'proyecto_tags');
+    }
+
+    public function proyectoImagen()
+    {
+        return $this->hasMany(ProyectoImagen::class);
+    }
+
+    public function proyectoArchivo()
+    {
+        return $this->hasMany(ProyectoArchivo::class);
+    }
+
+    public function valoracion()
+    {
+        return $this->belongsToMany(Usuario::class, 'valoraciones');
+    }
+
+    public function favorito()
+    {
+        return $this->belongsToMany(Usuario::class, 'favoritos');
+    }
+
+    public function comentario()
+    {
+        return $this->belongsToMany(Usuario::class, 'comentarios');
+    }
+
+    public function reporte()
+    {
+        return $this->belongsToMany(Usuario::class, 'reportes');
     }
 }

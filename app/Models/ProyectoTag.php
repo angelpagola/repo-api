@@ -9,7 +9,7 @@ class ProyectoTag extends Model
 {
     use HasFactory;
 
-    protected $table = 'proyecto_tag';
+    protected $table = 'proyecto_tags';
     public $timestamps = false;
     public $fillable = ['proyecto_id', 'tag_id'];
 }

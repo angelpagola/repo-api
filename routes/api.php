@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CursoController;
 use App\Http\Controllers\FavoritoController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\UsuarioController;
 use Illuminate\Http\Request;
@@ -28,14 +29,20 @@ Route::prefix('/usuario')->controller(UsuarioController::class)->group(function 
     Route::get('/{id}', 'show')->name('usuario.show');
 });
 
-Route::prefix('/curso')->controller(CursoController::class)->group(function () {
-    Route::get('/', 'index')->name('curso.index');
-    Route::get('/{id}', 'show')->name('curso.show');
-});
-
 Route::prefix('/proyecto')->controller(ProyectoController::class)->group(function () {
     Route::get('/', 'index')->name('proyecto.index');
     Route::get('/{id}', 'show')->name('proyecto.show');
+    Route::post('/', 'store')->name('proyecto.store');
+    Route::put('/{id}', 'update')->name('proyecto.update');
+    Route::delete('/{id}', 'destroy')->name('proyecto.destroy');
+});
+
+Route::prefix('/home')->controller(HomeController::class)->group(function () {
+    Route::get('/', 'index')->name('home.index');
+    Route::get('/{id}', 'show')->name('home.show');
+    Route::post('/', 'store')->name('home.store');
+    Route::put('/{id}', 'update')->name('home.update');
+    Route::delete('/{id}', 'destroy')->name('home.destroy');
 });
 
 Route::prefix('/favorito')->controller(FavoritoController::class)->group(function () {

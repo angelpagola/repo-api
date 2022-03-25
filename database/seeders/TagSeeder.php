@@ -27,6 +27,9 @@ class TagSeeder extends Seeder
             [
                 'nombre' => 'Ingeniería',
             ],
+            [
+                'nombre' => 'Lenguaje',
+            ],
         ];
         \App\Models\Tag::insert($tags);
     }

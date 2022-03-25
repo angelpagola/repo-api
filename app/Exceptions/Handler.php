@@ -35,7 +35,19 @@ class Handler extends ExceptionHandler
     public function register()
     {
         $this->reportable(function (Throwable $e) {
-            //
+            return response()->json(['mensaje' => 'Error De Modelo', 400]);
+        });
+        $this->reportable(function (Throwable $e) {
+            return response()->json(['mensaje' => 'Error De Autenticación', 401]);
+        });
+        $this->reportable(function (Throwable $e) {
+            return response()->json(['mensaje' => 'Error De Autenticación, No Tiene Permisos', 403]);
+        });
+        $this->reportable(function (Throwable $e) {
+            return response()->json(['mensaje' => 'Objeto No Encontrado', 404]);
+        });
+        $this->reportable(function (Throwable $e) {
+            return response()->json(['mensaje' => 'Objeto De Consultad BD', 500]);
         });
     }
 }

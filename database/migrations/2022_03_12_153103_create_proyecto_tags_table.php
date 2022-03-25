@@ -12,10 +12,14 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create('facultades', function (Blueprint $table) {
+        Schema::create('proyecto_tags', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
-            $table->string('abrev', 10);
+            $table->foreignId('proyecto_id')->constrained('proyectos')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+            $table->foreignId('tag_id')->constrained('tags')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
         });
     }
 
@@ -26,6 +30,6 @@ return new class extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('facultades');
+        Schema::dropIfExists('proyecto_tags');
     }
 };

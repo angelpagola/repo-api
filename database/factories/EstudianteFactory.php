@@ -18,10 +18,12 @@ class EstudianteFactory extends Factory
     public function definition()
     {
         return [
+            'uuid' => $this->faker->uuid,
             'nombres' => $this->faker->firstName . ' ' . $this->faker->firstName,
             'apellidos' => $this->faker->lastName . ' ' . $this->faker->lastName,
             'correo' => $this->faker->unique(true)->safeEmail(),
-            'telefono' => $this->faker->unique(true)->phoneNumber(),
+            'telefono' => $this->faker->unique(true)->numerify('#########'),
+            'linkedin' => $this->faker->firstName,
             'escuela_id' => Escuela::inRandomOrder()->first()->id
         ];
     }

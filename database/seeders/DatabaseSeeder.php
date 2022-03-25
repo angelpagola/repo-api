@@ -2,8 +2,10 @@
 
 namespace Database\Seeders;
 
+use Database\Factories\EstudianteFactory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,25 +16,34 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        //Todo: General
+        Storage::deleteDirectory('public/imagenes');
+        Storage::makeDirectory('public/imagenes');
+
+        Storage::deleteDirectory('public/documentos');
+        Storage::makeDirectory('public/documentos');
+
         //Todo: Nivel 0
-        $this->call(FacultadSeeder::class);
-        $this->call(CicloSeeder::class);
+        $this->call(EscuelaSeeder::class);
         $this->call(TagSeeder::class);
+        $this->call(MotivoSeeder::class);
 
         //Todo: Nivel 1
-        $this->call(EscuelaSeeder::class);
+        \App\Models\Estudiante::factory(10)->create();
 
         //Todo: Nivel 2
-        \App\Models\Estudiante::factory(9)->create();
-        \App\Models\Curso::factory(12)->create();
-
-        //Todo: Nivel 3
         $this->call(UsuarioSeeder::class);
         \App\Models\Proyecto::factory(20)->create();
 
-        //Todo: Nivel 4
-        \App\Models\ProyectoTag::factory(20)->create();
-        \App\Models\Favorito::factory(5)->create();
+        //Todo: Nivel 3
+        \App\Models\ProyectoTag::factory(50)->create();
+        \App\Models\ProyectoImagen::factory(30)->create();
+        \App\Models\ProyectoArchivo::factory(30)->create();
+        \App\Models\Valoracion::factory(10)->create();
+        \App\Models\Favorito::factory(10)->create();
+        \App\Models\TemaInteres::factory(10)->create();
+        \App\Models\Comentario::factory(5)->create();
+        \App\Models\Reporte::factory(2)->create();
 
     }
 }
