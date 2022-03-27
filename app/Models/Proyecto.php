@@ -28,6 +28,11 @@ class Proyecto extends Model
         return $this->hasMany(ProyectoImagen::class);
     }
 
+    public function portada()
+    {
+        return $this->hasMany(ProyectoImagen::class)->first();
+    }
+
     public function proyectoArchivo()
     {
         return $this->hasMany(ProyectoArchivo::class);

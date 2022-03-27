@@ -27,6 +27,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('/usuario')->controller(UsuarioController::class)->group(function () {
     Route::get('/', 'index')->name('usuario.index');
     Route::get('/{id}', 'show')->name('usuario.show');
+    Route::post('login', 'login')->name('usuario.login');
 });
 
 Route::prefix('/proyecto')->controller(ProyectoController::class)->group(function () {

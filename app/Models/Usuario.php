@@ -11,9 +11,9 @@ class Usuario extends Model
 
     protected $table = 'usuarios';
     public $timestamps = false;
-    public $fillable = ['uuid', 'usuario', '´password', 'activo', 'estudiante_id'];
+    protected $fillable = ['uuid', 'usuario', 'password', 'activo', 'estudiante_id'];
 
-    protected $hidden = ['uuid', 'password', 'activo'];
+    protected $hidden = ['password'];
 
     public function estudiante()
     {

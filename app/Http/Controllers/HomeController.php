@@ -15,7 +15,7 @@ class HomeController extends Controller
             if (is_null($request->buscar)) {
                 $proyecto = Proyecto::query()
                     ->with('estudiante', 'proyectoImagen')
-                    ->get()->random(10);
+                    ->get()->random(14);
             } else {
                 $proyecto = Proyecto::query()
                     ->with('estudiante', 'tag', 'proyectoImagen')
@@ -35,7 +35,7 @@ class HomeController extends Controller
                 ->whereHas('proyectoImagen', function ($query) {
                     $query->orderBy('id', 'desc');
                 })
-                ->get()->random(10);
+                ->get()->random(14);
 
             /*$proyecto = DB::table('proyectos')
                 ->join('estudiantes', 'estudiantes.id', '=', 'proyectos.estudiante_id')
