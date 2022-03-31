@@ -17,7 +17,7 @@ class EstudianteFactory extends Factory
      */
     public function definition()
     {
-        $url = '/repo-api/storage/app/public/avatars/';
+        $url = 'storage/avatars/';
         return [
             'uuid' => $this->faker->uuid,
             'nombres' => $this->faker->firstName . ' ' . $this->faker->firstName,

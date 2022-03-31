@@ -17,7 +17,7 @@ class ProyectoImagenFactory extends Factory
      */
     public function definition()
     {
-        $ruta = '/repo-api/storage/app/public/proyectos/imagenes/';
+        $ruta = 'storage/proyectos/imagenes/';
         return [
             'link_imagen' => asset($ruta . $this->faker->image('public/storage/proyectos/imagenes', 640, 480, null, false)),
             'proyecto_id' => Proyecto::inRandomOrder()->first()->id
