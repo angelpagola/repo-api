@@ -15,8 +15,8 @@ return new class extends Migration {
         Schema::create('escuelas', function (Blueprint $table) {
             $table->id();
             $table->string('uuid', 40);
-            $table->string('nombre', 50);
-            $table->string('facultad_abrev', 7);
+            $table->string('nombre', 50)->unique();
+            $table->string('facultad_abrev', 7)->unique();
         });
     }
 
