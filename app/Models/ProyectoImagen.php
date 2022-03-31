@@ -17,4 +17,5 @@ class ProyectoImagen extends Model
     {
         return $this->belongsTo(Proyecto::class);
     }
+
 }

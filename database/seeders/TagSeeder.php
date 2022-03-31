@@ -22,13 +22,28 @@ class TagSeeder extends Seeder
                 'nombre' => 'Telecomunicaciones',
             ],
             [
-                'nombre' => 'Matemática',
+                'nombre' => 'Gestión ambiental',
             ],
             [
-                'nombre' => 'Ingeniería',
+                'nombre' => 'Gerencia de Proyectos',
             ],
             [
-                'nombre' => 'Lenguaje',
+                'nombre' => 'Innovación y Emprendimiento',
+            ],
+            [
+                'nombre' => 'Seguridad Informática.',
+            ],
+            [
+                'nombre' => 'Sistemas de Información',
+            ],
+            [
+                'nombre' => 'Construcción y Gestión',
+            ],
+            [
+                'nombre' => 'Estructuras',
+            ],
+            [
+                'nombre' => 'Diagnóstico Empresarial',
             ],
         ];
         \App\Models\Tag::insert($tags);

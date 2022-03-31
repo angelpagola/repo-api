@@ -17,11 +17,16 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         //Todo: General
-        Storage::deleteDirectory('public/imagenes');
-        Storage::makeDirectory('public/imagenes');
+        $ruta = 'public/proyectos/';
+        Storage::deleteDirectory($ruta . 'imagenes');
+        Storage::makeDirectory($ruta . 'imagenes');
 
-        Storage::deleteDirectory('public/documentos');
-        Storage::makeDirectory('public/documentos');
+        Storage::deleteDirectory($ruta . 'documentos');
+        Storage::makeDirectory($ruta . 'documentos');
+
+        Storage::deleteDirectory('public/avatars');
+        Storage::makeDirectory('public/avatars');
+
 
         //Todo: Nivel 0
         $this->call(EscuelaSeeder::class);

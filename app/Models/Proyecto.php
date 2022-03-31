@@ -23,14 +23,14 @@ class Proyecto extends Model
         return $this->belongsToMany(Tag::class, 'proyecto_tags');
     }
 
-    public function proyectoImagen()
+    public function portadas()
     {
         return $this->hasMany(ProyectoImagen::class);
     }
 
     public function portada()
     {
-        return $this->hasMany(ProyectoImagen::class)->first();
+        return $this->hasOne(ProyectoImagen::class);
     }
 
     public function proyectoArchivo()
