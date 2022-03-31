@@ -23,30 +23,25 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
 Route::prefix('/usuario')->controller(UsuarioController::class)->group(function () {
-    Route::get('/', 'index')->name('usuario.index');
-    Route::get('/{id}', 'show')->name('usuario.show');
     Route::post('login', 'login')->name('usuario.login');
+    Route::post('signup', 'signup')->name('usuario.signup');
 });
 
-Route::prefix('/proyecto')->controller(ProyectoController::class)->group(function () {
+Route::prefix('/home')->controller(HomeController::class)->group(function () {
+    Route::get('/', 'index')->name('home.index');
+});
+
+
+/*Route::prefix('/proyecto')->controller(ProyectoController::class)->group(function () {
     Route::get('/', 'index')->name('proyecto.index');
     Route::get('/{id}', 'show')->name('proyecto.show');
     Route::post('/', 'store')->name('proyecto.store');
     Route::put('/{id}', 'update')->name('proyecto.update');
     Route::delete('/{id}', 'destroy')->name('proyecto.destroy');
-});
+});*/
 
-Route::prefix('/home')->controller(HomeController::class)->group(function () {
-    Route::get('/', 'index')->name('home.index');
-    Route::get('/{id}', 'show')->name('home.show');
-    Route::post('/', 'store')->name('home.store');
-    Route::put('/{id}', 'update')->name('home.update');
-    Route::delete('/{id}', 'destroy')->name('home.destroy');
-});
-
-Route::prefix('/favorito')->controller(FavoritoController::class)->group(function () {
+/*Route::prefix('/favorito')->controller(FavoritoController::class)->group(function () {
     Route::get('/', 'index')->name('favorito.index');
     Route::get('/{id}', 'show')->name('favorito.show');
-});
+});*/

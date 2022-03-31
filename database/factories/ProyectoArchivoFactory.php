@@ -17,8 +17,9 @@ class ProyectoArchivoFactory extends Factory
      */
     public function definition()
     {
+        $ruta = '/repo-api/storage/app/public/proyectos/documentos/';
         return [
-            'link_archivo' => 'documentos/' . $this->faker->image('public/storage/documentos', 640, 480, null, false),
+            'link_archivo' => asset($ruta . $this->faker->image('public/storage/proyectos/documentos', 640, 480, null, false)),
             'proyecto_id' => Proyecto::inRandomOrder()->first()->id
         ];
     }
