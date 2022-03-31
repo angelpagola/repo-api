@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->id();
             $table->string('uuid', 40);
             $table->string('nombre', 50)->unique();
-            $table->string('facultad_abrev', 7)->unique();
+            $table->string('facultad_abrev', 7);
         });
     }
 
