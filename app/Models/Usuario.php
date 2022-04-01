@@ -32,7 +32,7 @@ class Usuario extends Model
 
     public function tag()
     {
-        return $this->belongsToMany(Tag::class, 'tema_interes');
+        return $this->belongsToMany(Tag::class, 'tema_interes')->withPivot('id');
     }
 
     public function comentario()

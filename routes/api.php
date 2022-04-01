@@ -26,6 +26,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('/usuario')->controller(UsuarioController::class)->group(function () {
     Route::post('login', 'login')->name('usuario.login');
     Route::post('signup', 'signup')->name('usuario.signup');
+    Route::get('/perfil/avatar/{id}', 'avatar')->name('usuario.avatar');
+    Route::get('/perfil/interes/{id}', 'interes')->name('usuario.interes');
+    Route::get('/perfil/{id}', 'show')->name('usuario.show');
 });
 
 Route::prefix('/home')->controller(HomeController::class)->group(function () {

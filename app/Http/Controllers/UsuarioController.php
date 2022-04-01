@@ -72,4 +72,43 @@ class UsuarioController extends Controller
             'mensaje' => 'Usuario Creado Correctamente'
         ], 200);
     }
+
+    public function show($id)
+    {
+        $usuario = Usuario::query()
+            ->select('id', 'usuario', 'estudiante_id')
+            ->with('estudiante:id,nombres,apellidos,correo,telefono,linkedin,escuela_id')
+            ->find($id);
+
+        if ($usuario)
+            return response()->json(["respuesta" => true, "mensaje" => $usuario], 200);
+
+        return response()->json(["respuesta" => false, "mensaje" => "No hay ningun usuario con este ID"], 204);
+    }
+
+    public function avatar($id)
+    {
+        $avatar = Usuario::query()
+            ->select('id', 'estudiante_id')
+            ->with('estudiante:id,avatar')
+            ->find($id);
+
+        if ($avatar)
+            return response()->json(["respuesta" => true, "mensaje" => $avatar->estudiante->avatar], 200);
+
+        return response()->json(["respuesta" => false, "mensaje" => "No hay ningun usuario con este ID"], 204);
+    }
+
+    public function interes($id)
+    {
+        $temas = Usuario::query()
+            ->select('id')
+            ->with('tag')
+            ->find($id);
+
+        if ($temas)
+            return response()->json(["respuesta" => true, "mensaje" => $temas->tag], 200);
+
+        return response()->json(["respuesta" => false, "mensaje" => "No hay ningun usuario con este ID"], 204);
+    }
 }
