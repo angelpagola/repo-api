@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\storeProyecto;
 use App\Http\Requests\updateProyecto;
 use App\Models\Proyecto;
+use App\Models\ProyectoTag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ProyectoController extends Controller
@@ -49,8 +51,10 @@ class ProyectoController extends Controller
     public function show($id)
     {
         $proyecto = Proyecto::query()
-            ->with('estudiante', 'tag', 'proyectoImagen', 'proyectoArchivo')
-            ->find($id);
+            ->with('estudiante', 'estudiante.escuela', 'tag', 'portadas', 'proyectoArchivo')
+            ->where('id', $id)
+            ->first();
+
         if (is_null($proyecto)) {
             return response()->json(['mensaje' => 'Proyecto No Econtrado'], 404);
         }
@@ -89,5 +93,27 @@ class ProyectoController extends Controller
             return response()->json(['mensaje' => 'Proyecto No Encontrado'], 404);
         }
         return response()->json(null, 204);
+    }
+
+    public function recomendados($id)
+    {
+        $proyectos = Proyecto::query()
+            ->select('id', 'titulo', 'estudiante_id')
+            ->addSelect(['similitud' => ProyectoTag::select(DB::raw('count(*)'))
+                ->whereColumn('proyecto_id', 'proyectos.id')
+                ->whereIn('tag_id', function ($query) use ($id) {
+                    $query->select('tag_id')->from('proyecto_tags')->where('proyecto_id', $id);
+                })
+                ->take(1)
+            ])
+            ->with('portada', 'estudiante:id', 'estudiante.usuario:usuario,estudiante_id')
+            ->having('id', '<>', $id)
+            ->orderBy('similitud', 'desc')
+            ->orderBy('fecha_publicacion', 'desc')
+            ->limit(3)
+            ->get();
+
+        return response()->json($proyectos, 200);
+
     }
 }
