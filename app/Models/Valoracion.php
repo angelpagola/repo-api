@@ -11,6 +11,6 @@ class Valoracion extends Model
 
     protected $table = 'valoraciones';
     public $timestamps = false;
-    public $fillable = ['like', 'usuario_id', 'proyecto_id'];
+    public $fillable = ['me_gusta', 'usuario_id', 'proyecto_id'];
 
 }

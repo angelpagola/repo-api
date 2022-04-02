@@ -19,7 +19,7 @@ class ValoracionFactory extends Factory
     public function definition()
     {
         return [
-            'like' => $this->faker->boolean,
+            'me_gusta' => $this->faker->boolean,
             'usuario_id' => Usuario::inRandomOrder()->first()->id,
             'proyecto_id' => Proyecto::inRandomOrder()->first()->id
         ];
