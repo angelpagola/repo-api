@@ -43,6 +43,16 @@ class Proyecto extends Model
         return $this->belongsToMany(Usuario::class, 'valoraciones');
     }
 
+    public function likes()
+    {
+        return $this->belongsToMany(Usuario::class, 'valoraciones')->withPivot('me_gusta')->where('me_gusta', true);
+    }
+
+    public function dislikes()
+    {
+        return $this->belongsToMany(Usuario::class, 'valoraciones')->withPivot('me_gusta')->where('me_gusta', false);
+    }
+
     public function favorito()
     {
         return $this->belongsToMany(Usuario::class, 'favoritos');

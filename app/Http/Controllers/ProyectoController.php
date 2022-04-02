@@ -6,6 +6,7 @@ use App\Http\Requests\storeProyecto;
 use App\Http\Requests\updateProyecto;
 use App\Models\Proyecto;
 use App\Models\ProyectoTag;
+use App\Models\Valoracion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -115,5 +116,32 @@ class ProyectoController extends Controller
 
         return response()->json($proyectos, 200);
 
+    }
+
+    public function valoracion($proy_id, $user_id)
+    {
+        $proyecto = Proyecto::query()
+            ->select('id')
+            ->addSelect(['por_usuario' => Valoracion::select('me_gusta')
+                ->whereColumn('proyecto_id', 'proyectos.id')
+                ->where('usuario_id', $user_id)
+                ->take(1)
+            ])
+            ->withCount(['likes', 'dislikes'])->find($proy_id);
+        if ($proyecto)
+            return response()->json($proyecto, 200);
+
+        return response()->json([], 204);
+    }
+
+    public function favorito($proy_id, $user_id)
+    {
+        $proyecto = Proyecto::query()
+            ->select('id')
+            ->whereHas('favorito', function ($query) use ($user_id) {
+                $query->where('usuario_id', $user_id);
+            })->find($proy_id);
+
+        return response()->json(["es_favorito" => (bool)$proyecto], 200);
     }
 }

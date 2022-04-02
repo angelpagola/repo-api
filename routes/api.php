@@ -39,6 +39,8 @@ Route::prefix('/home')->controller(HomeController::class)->group(function () {
 Route::prefix('/proyecto')->controller(ProyectoController::class)->group(function () {
     Route::get('/', 'index')->name('proyecto.index');
     Route::get('/recomendacion/{id}', 'recomendados')->name('proyecto.recomendados');
+    Route::get('/valoracion/{proy_id}/{user_id}', 'valoracion')->name('proyecto.valoracion');
+    Route::get('/favorito/{proy_id}/{user_id}', 'favorito')->name('proyecto.favorito');
     Route::get('/{id}', 'show')->name('proyecto.show');
     Route::post('/', 'store')->name('proyecto.store');
     Route::put('/{id}', 'update')->name('proyecto.update');
