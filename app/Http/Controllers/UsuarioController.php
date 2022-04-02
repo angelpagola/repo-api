@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Usuario\signupUsuario;
+use App\Http\Requests\Usuario\SignupUsuario;
 use App\Models\Estudiante;
 use App\Models\TemaInteres;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class UsuarioController extends Controller
@@ -40,37 +41,60 @@ class UsuarioController extends Controller
         }
     }
 
-    public function signup(signupUsuario $request)
+    public function signup(Request $request)
     {
-        $estudiante = Estudiante::create([
-            'uuid' => Str::uuid(),
-            'nombres' => $request->nombres,
-            'apellidos' => $request->apellidos,
-            'correo' => $request->correo,
-            'telefono' => $request->telefono,
-            'linkedin' => $request->linkedin,
-            'escuela_id' => $request->escuela_id,
-        ]);
+        $rules = [
+            "nombres" => "required|max:40",
+            "apellidos" => "required|max:40",
+            "escuela_id" => "required|integer|gt:0",
+            "username" => "required|unique:usuarios,usuario|max:25",
+            "password" => "required|min:8",
+            "correo" => "unique:estudiantes,correo|max:100",
+            "telefono" => "unique:estudiantes,telefono|min:9",
+            "linkedin" => "unique:estudiantes,linkedin|max:100",
+        ];
 
-        $usuario = Usuario::create([
-            'uuid' => Str::uuid(),
-            'usuario' => $request->usuario,
-            'password' => Hash::make($request->password),
-            'activo' => 1,
-            'estudiante_id' => $estudiante->id
-        ]);
+        $validator = Validator::make($request->all(), $rules);
 
-        foreach ($request->tag_id as $tagid) {
-            TemaInteres::create([
-                'usuario_id' => $usuario->id,
-                'tag_id' => $tagid
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => [
+                    'respuesta' => false,
+                    'mensaje' => 'Error de validación',
+                    'error' => $validator->errors(),
+                ]
+            ], 422);
+        } else {
+            $estudiante = Estudiante::create([
+                'uuid' => Str::uuid(),
+                'nombres' => $request->nombres,
+                'apellidos' => $request->apellidos,
+                'correo' => $request->correo,
+                'telefono' => $request->telefono,
+                'linkedin' => $request->linkedin,
+                'escuela_id' => $request->escuela_id,
             ]);
-        }
 
-        return response()->json([
-            'respuesta' => true,
-            'mensaje' => 'Usuario Creado Correctamente'
-        ], 200);
+            $usuario = Usuario::create([
+                'uuid' => Str::uuid(),
+                'usuario' => $request->username,
+                'password' => Hash::make($request->password),
+                'activo' => 1,
+                'estudiante_id' => $estudiante->id
+            ]);
+
+            foreach ($request->tag_id as $tagid) {
+                TemaInteres::create([
+                    'usuario_id' => $usuario->id,
+                    'tag_id' => $tagid
+                ]);
+            }
+
+            return response()->json([
+                'respuesta' => true,
+                'mensaje' => 'Usuario Creado Correctamente'
+            ], 201);
+        }
     }
 
     public function show($id)
