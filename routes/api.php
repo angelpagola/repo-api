@@ -29,7 +29,8 @@ Route::prefix('/usuario')->controller(UsuarioController::class)->group(function 
     Route::get('/perfil/avatar/{id}', 'avatar')->name('usuario.avatar');
     Route::get('/perfil/interes/{id}', 'interes')->name('usuario.interes');
     Route::get('/perfil/{id}', 'show')->name('usuario.show');
-    Route::put('/perfil/avatar/update', 'avatarUpdate')->name('usuario.avatar.update');
+    Route::put('/perfil/update/{id}', 'usuarioUpdate')->name('usuario.update');
+    Route::put('/perfil/avatar/update/{id}', 'avatarUpdate')->name('usuario.avatar.update');
 });
 
 Route::prefix('/home')->controller(HomeController::class)->group(function () {
