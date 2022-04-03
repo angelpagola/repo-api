@@ -31,6 +31,7 @@ Route::prefix('/usuario')->controller(UsuarioController::class)->group(function 
     Route::get('/perfil/{id}', 'show')->name('usuario.show');
     Route::put('/perfil/update/{id}', 'usuarioUpdate')->name('usuario.update');
     Route::put('/perfil/avatar/update/{id}', 'avatarUpdate')->name('usuario.avatar.update');
+    Route::delete('/perfil/interes/{usuario}/{tag}', 'interesDelete')->name('usuario.interes.delete');
 });
 
 Route::prefix('/home')->controller(HomeController::class)->group(function () {

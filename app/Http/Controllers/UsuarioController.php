@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Usuario\SignupUsuario;
 use App\Models\Estudiante;
 use App\Models\ProyectoImagen;
+use App\Models\Tag;
 use App\Models\TemaInteres;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
@@ -255,5 +256,25 @@ class UsuarioController extends Controller
         }
     }
 
+    public function interesDelete(Usuario $usuario, Tag $tag)
+    {
+        $interes = TemaInteres::query()
+            ->where('usuario_id', $usuario->id)
+            ->where('tag_id', $tag->id)
+            ->first();
+
+        if ($interes) {
+            $interes->delete();
+            return response()->json([
+                'respuesta' => true,
+                'mensaje' => 'Tema Interes del Usuario Eliminado Correctamente'
+            ], 201);
+        } else {
+            return response()->json([
+                'respuesta' => false,
+                'mensaje' => 'No existe ningún temas de interes.'
+            ], 200);
+        }
+    }
 
 }
