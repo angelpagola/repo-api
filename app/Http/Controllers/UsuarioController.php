@@ -107,9 +107,9 @@ class UsuarioController extends Controller
                 "nombres" => "required|max:40",
                 "apellidos" => "required|max:40",
                 "escuela_id" => "required|integer|gt:0",
-                "correo" => "max:100|unique:estudiantes,correo",
-                "telefono" => "min:9|unique:estudiantes,telefono",
-                "linkedin" => "max:100|unique:estudiantes,linkedin",
+                "correo" => "max:100|unique:estudiantes,correo,".$usuario->estudiante_id,
+                "telefono" => "min:9|unique:estudiantes,telefono,".$usuario->estudiante_id,
+                "linkedin" => "max:100|unique:estudiantes,linkedin,".$usuario->estudiante_id,
             ];
 
             $validator = Validator::make($request->all(), $rules);
