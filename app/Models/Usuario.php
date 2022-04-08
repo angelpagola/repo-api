@@ -35,6 +35,12 @@ class Usuario extends Model
         return $this->belongsToMany(Tag::class, 'tema_interes')->withPivot('id');
     }
 
+    //Es similar a la function tag()
+    public function intereses()
+    {
+        return $this->belongsToMany(Tag::class, 'tema_interes')->withPivot('id');
+    }
+
     public function comentario()
     {
         return $this->belongsToMany(Proyecto::class, 'comentarios');

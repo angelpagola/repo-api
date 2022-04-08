@@ -47,54 +47,48 @@ class UsuarioController extends Controller
             "nombres" => "required|max:40",
             "apellidos" => "required|max:40",
             "escuela_id" => "required|integer|gt:0",
-            "username" => "required|unique:usuarios,usuario|max:25",
+            "username" => "required|unique:usuarios,usuario|max:25|min:5",
             "password" => "required|min:8",
-            "correo" => "unique:estudiantes,correo|max:100",
-            "telefono" => "unique:estudiantes,telefono|min:9",
-            "linkedin" => "unique:estudiantes,linkedin|max:100",
+            "correo" => "mail|unique:estudiantes,correo|max:100",
+            "telefono" => "unique:estudiantes,telefono|max:9|min:9",
+            "linkedin" => "url|unique:estudiantes,linkedin|max:100",
+            'tags' => 'required|array|min:3',
         ];
 
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return response()->json([
-                'error' => [
-                    'respuesta' => false,
-                    'mensaje' => 'Error de validación',
-                    'error' => $validator->errors(),
-                ]
+                'respuesta' => false, 'mensaje' => 'Error de validación', 'error' => $validator->errors()
             ], 422);
-        } else {
-            $estudiante = Estudiante::create([
-                'uuid' => Str::uuid(),
-                'nombres' => $request->nombres,
-                'apellidos' => $request->apellidos,
-                'correo' => $request->correo,
-                'telefono' => $request->telefono,
-                'linkedin' => $request->linkedin,
-                'escuela_id' => $request->escuela_id,
-            ]);
-
-            $usuario = Usuario::create([
-                'uuid' => Str::uuid(),
-                'usuario' => $request->username,
-                'password' => Hash::make($request->password),
-                'activo' => 1,
-                'estudiante_id' => $estudiante->id
-            ]);
-
-            foreach ($request->tag_id as $tagid) {
-                TemaInteres::create([
-                    'usuario_id' => $usuario->id,
-                    'tag_id' => $tagid
-                ]);
-            }
-
-            return response()->json([
-                'respuesta' => true,
-                'mensaje' => 'Usuario Creado Correctamente'
-            ], 201);
         }
+
+        $estudiante = Estudiante::create([
+            'uuid' => Str::uuid(),
+            'nombres' => $request->nombres,
+            'apellidos' => $request->apellidos,
+            'correo' => $request->correo,
+            'telefono' => $request->telefono,
+            'linkedin' => $request->linkedin,
+            'escuela_id' => $request->escuela_id,
+        ]);
+
+        $usuario = Usuario::create([
+            'uuid' => Str::uuid(),
+            'usuario' => strtolower(str_replace(" ", "_", $request->username)),
+            'password' => Hash::make($request->password),
+            'activo' => 1,
+            'estudiante_id' => $estudiante->id
+        ]);
+
+        $usuario->intereses()->attach($request->tags);
+
+        return response()->json([
+            'respuesta' => true,
+            'mensaje' => Usuario::query()
+                ->select("id", "usuario", "estudiante_id")
+                ->with('estudiante:id,nombres,apellidos,avatar')->find($usuario->id)
+        ], 201);
     }
 
     public function show($id)
@@ -127,7 +121,7 @@ class UsuarioController extends Controller
     {
         $temas = Usuario::query()
             ->select('id')
-            ->with('tag')
+            ->with('intereses')
             ->find($id);
 
         if ($temas)
