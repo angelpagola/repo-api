@@ -6,6 +6,7 @@ use App\Http\Requests\storeProyecto;
 use App\Http\Requests\updateProyecto;
 use App\Models\Proyecto;
 use App\Models\ProyectoTag;
+use App\Models\Usuario;
 use App\Models\Valoracion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,32 +22,33 @@ class ProyectoController extends Controller
         return response()->json($proyecto, 200);
     }
 
-    public function index(Request $request)
+    public function index(Usuario $usuario)
     {
-        if ($request->has('buscar')) {
-            if (is_null($request->buscar)) {
-                $proyecto = Proyecto::query()
-                    ->with('estudiante', 'tag', 'proyectoImagen')
-                    ->get()->random(2);
+        if ($usuario) {
+            $callback = Proyecto::query()
+                ->select('id', 'uuid', 'titulo', 'fecha_publicacion', 'estudiante_id')
+                ->with('estudiante:id,apellidos,nombres,avatar', 'estudiante.usuario:usuario,estudiante_id', 'portada:id,link_imagen,proyecto_id', 'tags:id,nombre');
+
+            $proyecto = $callback->where('estudiante_id', $usuario->estudiante_id)->get();
+
+            if ($proyecto) {
+                return response()->json([
+                    'respuesta' => true,
+                    'mensaje' => $proyecto
+                ], 200);
             } else {
-                $proyecto = Proyecto::query()
-                    ->with('estudiante', 'tag', 'proyectoImagen')
-                    ->where('titulo', 'like', '%' . $request->buscar . '%')
-                    ->orWhereHas('estudiante', function ($query) use ($request) {
-                        return $query->where('nombres', 'like', '%' . $request->buscar . '%');
-                    })
-                    ->orWhereHas('tag', function ($query) use ($request) {
-                        return $query->where('nombre', 'like', '%' . $request->buscar . '%');
-                    })
-                    ->get();
+                return response()->json([
+                    'respuesta' => true,
+                    'mensaje' => 'El estudiante no tiene proyectos por el momento'
+                ], 200);
             }
         } else {
-            $proyecto = Proyecto::query()
-                ->with('estudiante', 'tag', 'proyectoImagen')
-                ->get()->random(2);
+            return response()->json([
+                'respuesta' => false,
+                'mensaje' => 'No existe ningún usuario con este id en el sistema.'
+            ], 200);
         }
 
-        return response()->json($proyecto, 200);
     }
 
     public function show($id)

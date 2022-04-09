@@ -110,12 +110,9 @@ class UsuarioController extends Controller
 
             if ($validator->fails()) {
                 return response()->json([
-                    'error' => [
-                        'respuesta' => false,
-                        'mensaje' => 'Error de validación',
-                        'error' => $validator->errors(),
-                    ]
-                ], 422);
+                    'respuesta' => false,
+                    'mensaje' => 'Error de validación', 'error' => $validator->errors()
+                ], 200);
             } else {
 
                 $estudiante = Estudiante::find($usuario->estudiante_id);
