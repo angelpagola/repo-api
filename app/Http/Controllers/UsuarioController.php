@@ -101,14 +101,14 @@ class UsuarioController extends Controller
                 'mensaje' => 'No existe ningún usuario con este id en el sistema.'
             ], 200);
         }
-
+      
         $rules = [
             "nombres" => "required|max:40",
             "apellidos" => "required|max:40",
             "escuela_id" => "required|integer|gt:0",
-            "correo" => "max:100|unique:estudiantes,correo," . $usuario->estudiante_id,
-            "telefono" => "min:9|unique:estudiantes,telefono," . $usuario->estudiante_id,
-            "linkedin" => "max:100|unique:estudiantes,linkedin," . $usuario->estudiante_id,
+            "correo" => "nullable|max:100|unique:estudiantes,correo," . $usuario->estudiante_id,
+            "telefono" => "nullable|min:9|unique:estudiantes,telefono," . $usuario->estudiante_id,
+            "linkedin" => "nullable|max:100|unique:estudiantes,linkedin," . $usuario->estudiante_id,
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -136,6 +136,23 @@ class UsuarioController extends Controller
                 'mensaje' => 'Datos de Usurio Editado Correctamente'
             ], 201);
         }
+
+        $estudiante = Estudiante::find($usuario->estudiante_id);
+
+        $estudiante->update([
+            'nombres' => $request->nombres,
+            'apellidos' => $request->apellidos,
+            'correo' => $request->correo,
+            'telefono' => $request->telefono,
+            'linkedin' => $request->linkedin,
+            'escuela_id' => $request->escuela_id,
+        ]);
+
+        return response()->json([
+            'respuesta' => true,
+            'mensaje' => 'Datos de Usuario Editado Correctamente'
+        ], 201);
+
     }
 
     public function show($usuario_id)
@@ -145,10 +162,20 @@ class UsuarioController extends Controller
             ->with('estudiante:id,nombres,apellidos,correo,telefono,linkedin,escuela_id')
             ->find($usuario_id);
 
-        if ($usuario)
-            return response()->json(["respuesta" => true, "mensaje" => $usuario], 200);
+        if (!$usuario)
+            return response()->json(["respuesta" => false, "mensaje" => "No hay ningun usuario con este ID"], 200);
 
-        return response()->json(["respuesta" => false, "mensaje" => "No hay ningun usuario con este ID"], 204);
+        return response()->json(["respuesta" => true, "mensaje" => [
+            "id" => $usuario->id,
+            "estudiante_id" => $usuario->estudiante_id,
+            "usuario" => $usuario->usuario,
+            "nombres" => $usuario->estudiante->nombres,
+            "apellidos" => $usuario->estudiante->apellidos,
+            "escuela_id" => $usuario->estudiante->escuela_id,
+            "correo" => $usuario->estudiante->correo,
+            "telefono" => $usuario->estudiante->telefono,
+            "linkedin" => $usuario->estudiante->linkedin,
+        ]], 200);
     }
 
     public function avatar($usuario_id)
