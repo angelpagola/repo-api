@@ -16,28 +16,28 @@ class ProyectoController extends Controller
 {
     public function index(Usuario $usuario)
     {
-        if ($usuario) {
-            $callback = Proyecto::query()
-                ->select('id', 'uuid', 'titulo', 'fecha_publicacion', 'estudiante_id')
-                ->with('estudiante:id,apellidos,nombres,avatar', 'estudiante.usuario:usuario,estudiante_id', 'portada:id,link_imagen,proyecto_id', 'tags:id,nombre');
-
-            $proyecto = $callback->where('estudiante_id', $usuario->estudiante_id)->get();
-
-            if ($proyecto) {
-                return response()->json([
-                    'respuesta' => true,
-                    'mensaje' => $proyecto
-                ], 200);
-            } else {
-                return response()->json([
-                    'respuesta' => true,
-                    'mensaje' => 'El estudiante no tiene proyectos por el momento'
-                ], 200);
-            }
-        } else {
+        if (!$usuario) {
             return response()->json([
                 'respuesta' => false,
                 'mensaje' => 'No existe ningún usuario con este id en el sistema.'
+            ], 200);
+        }
+
+        $callback = Proyecto::query()
+            ->select('id', 'uuid', 'titulo', 'fecha_publicacion', 'estudiante_id')
+            ->with('estudiante:id,apellidos,nombres,avatar', 'estudiante.usuario:usuario,estudiante_id', 'portada:id,link_imagen,proyecto_id', 'tags:id,nombre');
+
+        $proyecto = $callback->where('estudiante_id', $usuario->estudiante_id)->get();
+
+        if ($proyecto) {
+            return response()->json([
+                'respuesta' => true,
+                'mensaje' => $proyecto
+            ], 200);
+        } else {
+            return response()->json([
+                'respuesta' => true,
+                'mensaje' => 'El estudiante no tiene proyectos por el momento'
             ], 200);
         }
 

@@ -43,10 +43,10 @@ Route::prefix('/proyecto')->controller(ProyectoController::class)->group(functio
     Route::get('/valoracion/{proyecto_id}/{usuario_id}', 'valoracion')->name('proyecto.valoracion');
     Route::get('/favorito/{proyecto_id}/{usuario_id}', 'favorito')->name('proyecto.favorito');
     Route::get('/recomendacion/{proyecto_id}', 'recomendados')->name('proyecto.recomendados');
+    Route::get('/usuario/{usuario}', 'index')->name('proyecto.index');
     Route::post('/', 'store')->name('proyecto.store');
     Route::put('/{id}', 'update')->name('proyecto.update');
     Route::delete('/{id}', 'destroy')->name('proyecto.destroy');
-//    Route::get('/{usuario}', 'index')->name('proyecto.index');
 });
 
 /*Route::prefix('/favorito')->controller(FavoritoController::class)->group(function () {
