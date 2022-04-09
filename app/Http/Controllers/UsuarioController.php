@@ -95,56 +95,55 @@ class UsuarioController extends Controller
 
     public function usuarioUpdate(Request $request, Usuario $usuario)
     {
-        if ($usuario) {
-
-            $rules = [
-                "nombres" => "required|max:40",
-                "apellidos" => "required|max:40",
-                "escuela_id" => "required|integer|gt:0",
-                "correo" => "max:100|unique:estudiantes,correo," . $usuario->estudiante_id,
-                "telefono" => "min:9|unique:estudiantes,telefono," . $usuario->estudiante_id,
-                "linkedin" => "max:100|unique:estudiantes,linkedin," . $usuario->estudiante_id,
-            ];
-
-            $validator = Validator::make($request->all(), $rules);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'respuesta' => false,
-                    'mensaje' => 'Error de validación', 'error' => $validator->errors()
-                ], 200);
-            } else {
-
-                $estudiante = Estudiante::find($usuario->estudiante_id);
-
-                $estudiante->update([
-                    'nombres' => $request->nombres,
-                    'apellidos' => $request->apellidos,
-                    'correo' => $request->correo,
-                    'telefono' => $request->telefono,
-                    'linkedin' => $request->linkedin,
-                    'escuela_id' => $request->escuela_id,
-                ]);
-
-                return response()->json([
-                    'respuesta' => true,
-                    'mensaje' => 'Datos de Usurio Editado Correctamente'
-                ], 201);
-            }
-        } else {
+        if (!$usuario) {
             return response()->json([
                 'respuesta' => false,
                 'mensaje' => 'No existe ningún usuario con este id en el sistema.'
             ], 200);
         }
+
+        $rules = [
+            "nombres" => "required|max:40",
+            "apellidos" => "required|max:40",
+            "escuela_id" => "required|integer|gt:0",
+            "correo" => "max:100|unique:estudiantes,correo," . $usuario->estudiante_id,
+            "telefono" => "min:9|unique:estudiantes,telefono," . $usuario->estudiante_id,
+            "linkedin" => "max:100|unique:estudiantes,linkedin," . $usuario->estudiante_id,
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'respuesta' => false,
+                'mensaje' => 'Error de validación', 'error' => $validator->errors()
+            ], 200);
+        } else {
+
+            $estudiante = Estudiante::find($usuario->estudiante_id);
+
+            $estudiante->update([
+                'nombres' => $request->nombres,
+                'apellidos' => $request->apellidos,
+                'correo' => $request->correo,
+                'telefono' => $request->telefono,
+                'linkedin' => $request->linkedin,
+                'escuela_id' => $request->escuela_id,
+            ]);
+
+            return response()->json([
+                'respuesta' => true,
+                'mensaje' => 'Datos de Usurio Editado Correctamente'
+            ], 201);
+        }
     }
 
-    public function show($id)
+    public function show($usuario_id)
     {
         $usuario = Usuario::query()
             ->select('id', 'usuario', 'estudiante_id')
             ->with('estudiante:id,nombres,apellidos,correo,telefono,linkedin,escuela_id')
-            ->find($id);
+            ->find($usuario_id);
 
         if ($usuario)
             return response()->json(["respuesta" => true, "mensaje" => $usuario], 200);
@@ -152,12 +151,12 @@ class UsuarioController extends Controller
         return response()->json(["respuesta" => false, "mensaje" => "No hay ningun usuario con este ID"], 204);
     }
 
-    public function avatar($id)
+    public function avatar($usuario_id)
     {
         $avatar = Usuario::query()
             ->select('id', 'estudiante_id')
             ->with('estudiante:id,avatar')
-            ->find($id);
+            ->find($usuario_id);
 
         if ($avatar)
             return response()->json(["respuesta" => true, "mensaje" => $avatar->estudiante->avatar], 200);
@@ -165,12 +164,12 @@ class UsuarioController extends Controller
         return response()->json(["respuesta" => false, "mensaje" => "No hay ningun usuario con este ID"], 204);
     }
 
-    public function interes($id)
+    public function interes($usuario_id)
     {
         $temas = Usuario::query()
             ->select('id')
             ->with('intereses')
-            ->find($id);
+            ->find($usuario_id);
 
         if ($temas)
             return response()->json(["respuesta" => true, "mensaje" => $temas->tag], 200);
@@ -247,10 +246,10 @@ class UsuarioController extends Controller
 
     }
 
-    public function interesDelete($id)
+    public function interesDelete($tag_id)
     {
         $interes = TemaInteres::query()
-            ->find($id);
+            ->find($tag_id);
 
         if ($interes) {
             $interes->delete();

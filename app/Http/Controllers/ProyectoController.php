@@ -14,14 +14,6 @@ use Illuminate\Support\Str;
 
 class ProyectoController extends Controller
 {
-    public function indexG()
-    {
-        $proyecto = Proyecto::query()
-            ->with('estudiante', 'tag', 'proyectoImagen')
-            ->get()->random(2);
-        return response()->json($proyecto, 200);
-    }
-
     public function index(Usuario $usuario)
     {
         if ($usuario) {
@@ -51,11 +43,11 @@ class ProyectoController extends Controller
 
     }
 
-    public function show($id)
+    public function show($proyecto_id)
     {
         $proyecto = Proyecto::query()
-            ->with('estudiante', 'estudiante.escuela', 'tag', 'portadas', 'proyectoArchivo')
-            ->where('id', $id)
+            ->with('estudiante', 'estudiante.escuela', 'tags', 'portadas', 'proyectoArchivo')
+            ->where('id', $proyecto_id)
             ->first();
 
         if (is_null($proyecto)) {
@@ -98,19 +90,19 @@ class ProyectoController extends Controller
         return response()->json(null, 204);
     }
 
-    public function recomendados($id)
+    public function recomendados($proyecto_id)
     {
         $proyectos = Proyecto::query()
             ->select('id', 'titulo', 'estudiante_id')
             ->addSelect(['similitud' => ProyectoTag::select(DB::raw('count(*)'))
                 ->whereColumn('proyecto_id', 'proyectos.id')
-                ->whereIn('tag_id', function ($query) use ($id) {
-                    $query->select('tag_id')->from('proyecto_tags')->where('proyecto_id', $id);
+                ->whereIn('tag_id', function ($query) use ($proyecto_id) {
+                    $query->select('tag_id')->from('proyecto_tags')->where('proyecto_id', $proyecto_id);
                 })
                 ->take(1)
             ])
             ->with('portada', 'estudiante:id', 'estudiante.usuario:usuario,estudiante_id')
-            ->having('id', '<>', $id)
+            ->having('id', '<>', $proyecto_id)
             ->orderBy('similitud', 'desc')
             ->orderBy('fecha_publicacion', 'desc')
             ->limit(3)
@@ -120,16 +112,16 @@ class ProyectoController extends Controller
 
     }
 
-    public function valoracion($proy_id, $user_id)
+    public function valoracion($proyecto_id, $usuario_id)
     {
         $proyecto = Proyecto::query()
             ->select('id')
             ->addSelect(['por_usuario' => Valoracion::select('me_gusta')
                 ->whereColumn('proyecto_id', 'proyectos.id')
-                ->where('usuario_id', $user_id)
+                ->where('usuario_id', $usuario_id)
                 ->take(1)
             ])
-            ->withCount(['likes', 'dislikes'])->find($proy_id);
+            ->withCount(['likes', 'dislikes'])->find($proyecto_id);
         if ($proyecto)
             return response()->json($proyecto, 200);
 
