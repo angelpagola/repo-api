@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Usuario\SignupUsuario;
 use App\Models\Estudiante;
-use App\Models\ProyectoImagen;
 use App\Models\Tag;
 use App\Models\TemaInteres;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -51,9 +50,9 @@ class UsuarioController extends Controller
             "escuela_id" => "required|integer|gt:0",
             "username" => "required|unique:usuarios,usuario|max:25|min:5",
             "password" => "required|min:8",
-            "correo" => "mail|unique:estudiantes,correo|max:100",
-            "telefono" => "unique:estudiantes,telefono|max:9|min:9",
-            "linkedin" => "url|unique:estudiantes,linkedin|max:100",
+            "correo" => "nullable|unique:estudiantes,correo|max:100",
+            "telefono" => "nullable|unique:estudiantes,telefono|max:9|min:9",
+            "linkedin" => "nullable|url|unique:estudiantes,linkedin|max:100",
             'tags' => 'required|array|min:3',
         ];
 
@@ -61,8 +60,9 @@ class UsuarioController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'respuesta' => false, 'mensaje' => 'Error de validación', 'error' => $validator->errors()
-            ], 422);
+                'respuesta' => false,
+                'mensaje' => 'Error de validación', 'error' => $validator->errors()
+            ], 200);
         }
 
         $estudiante = Estudiante::create([
@@ -101,9 +101,9 @@ class UsuarioController extends Controller
                 "nombres" => "required|max:40",
                 "apellidos" => "required|max:40",
                 "escuela_id" => "required|integer|gt:0",
-                "correo" => "max:100|unique:estudiantes,correo,".$usuario->estudiante_id,
-                "telefono" => "min:9|unique:estudiantes,telefono,".$usuario->estudiante_id,
-                "linkedin" => "max:100|unique:estudiantes,linkedin,".$usuario->estudiante_id,
+                "correo" => "max:100|unique:estudiantes,correo," . $usuario->estudiante_id,
+                "telefono" => "min:9|unique:estudiantes,telefono," . $usuario->estudiante_id,
+                "linkedin" => "max:100|unique:estudiantes,linkedin," . $usuario->estudiante_id,
             ];
 
             $validator = Validator::make($request->all(), $rules);
@@ -270,5 +270,4 @@ class UsuarioController extends Controller
             ], 200);
         }
     }
-
 }
