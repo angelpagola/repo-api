@@ -183,79 +183,77 @@ class UsuarioController extends Controller
 
     public function avatarUpdate(Request $request, Usuario $usuario)
     {
-        if ($usuario) {
 
-            $rules = [
-                "avatar" => "required",
-                "avatar.*" => "image|mimes:png,jpeg,jpg",
-            ];
-
-            $validator = Validator::make($request->all(), $rules);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'error' => [
-                        'respuesta' => false,
-                        'mensaje' => 'Error de validación',
-                        'error' => $validator->errors(),
-                    ]
-                ], 422);
-            } else {
-                if ($request->hasFile('avatar')) {
-                    $rutaCarpeta = 'public/storage/avatars/' . $usuario->id;
-
-                    //verificar si existe la carpeta public/storage/avatars, crear si no existe
-                    if (!Storage::exists($rutaCarpeta)) {
-                        Storage::makeDirectory($rutaCarpeta);
-                    }
-
-                    $nombreArchivo = $request->file('avatar')->getClientOriginalName();
-                    if (!$nombreArchivo) {
-                        $nombreArchivo = "Archivo adjunto";
-                    }
-
-                    $existe = Storage::disk('public')->exists('storage/avatars/' . $nombreArchivo);
-                    $num = 0;
-                    if ($existe) {
-                        $aux = $nombreArchivo;
-                        while ($existe) {
-                            $num++;
-                            $aux = $num . '_' . $aux;
-                            $existe = Storage::disk('public')->exists('storage/avatars/' . $aux);
-                            $aux = $nombreArchivo;
-                        }
-                        $nombreArchivo = $num . '_' . $nombreArchivo;
-                    }
-
-                    $url = 'storage/avatars/' . $usuario->id . '/';
-                    $request->file('avatar')->storeAs($rutaCarpeta, asset($url . $nombreArchivo));
-
-                    $estudiante = Estudiante::find($usuario->estudiante_id);
-
-                    $estudiante->update([
-                        "avatar" => asset($url . $nombreArchivo)
-                    ]);
-
-                    return response()->json([
-                        'respuesta' => true,
-                        'mensaje' => 'Avatar del Usuario Editado Correctamente'
-                    ], 201);
-                }
-            }
-        } else {
+        if (!$usuario) {
             return response()->json([
                 'respuesta' => false,
                 'mensaje' => 'No existe ningún usuario con este id en el sistema.'
             ], 200);
         }
+
+        $rules = [
+            "avatar" => "required",
+            "avatar.*" => "image|mimes:png,jpeg,jpg",
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'respuesta' => false,
+                'mensaje' => 'Error de validación ' . $usuario->id,
+                'error' => $validator->errors(),
+            ], 200);
+        }
+
+        if ($request->hasFile('avatar')) {
+
+            $rutaCarpeta = 'public/avatars';
+
+            //verificar si existe la carpeta public/storage/avatars, crear si no existe
+            if (!Storage::exists($rutaCarpeta)) {
+                Storage::makeDirectory($rutaCarpeta);
+            }
+
+            $nombreArchivo = $request->file('avatar')->getClientOriginalName();
+
+            $existe = Storage::disk('public')->exists('avatars/' . $nombreArchivo);
+
+            $num = 0;
+            if ($existe) {
+                $aux = $nombreArchivo;
+                while ($existe) {
+                    $num++;
+                    $aux = $num . '_' . $aux;
+                    $existe = Storage::disk('public')->exists('storage/avatars/' . $aux);
+                    $aux = $nombreArchivo;
+                }
+                $nombreArchivo = $num . '_' . $nombreArchivo;
+            }
+
+            $url = 'storage/avatars/';
+            $request->file('avatar')->storeAs($rutaCarpeta, $nombreArchivo);
+
+            $estudiante = Estudiante::find($usuario->estudiante_id);
+
+            $link_avatar = asset($url . $nombreArchivo);
+
+            $estudiante->update([
+                "avatar" => $link_avatar
+            ]);
+
+            return response()->json([
+                'respuesta' => true,
+                'mensaje' => $link_avatar
+            ], 201);
+        }
+
     }
 
-    public function interesDelete(Usuario $usuario, Tag $tag)
+    public function interesDelete($id)
     {
         $interes = TemaInteres::query()
-            ->where('usuario_id', $usuario->id)
-            ->where('tag_id', $tag->id)
-            ->first();
+            ->find($id);
 
         if ($interes) {
             $interes->delete();

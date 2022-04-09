@@ -29,8 +29,8 @@ Route::prefix('/usuario')->controller(UsuarioController::class)->group(function 
     Route::get('/perfil/interes/{id}', 'interes')->name('usuario.interes');
     Route::get('/perfil/{id}', 'show')->name('usuario.show');
     Route::put('/perfil/update/{usuario}', 'usuarioUpdate')->name('usuario.update');
-    Route::put('/perfil/avatar/update/{usuario}', 'avatarUpdate')->name('usuario.avatar.update');
-    Route::delete('/perfil/interes/{usuario}/{tag}', 'interesDelete')->name('usuario.interes.delete');
+    Route::post('/perfil/avatar/update/{usuario}', 'avatarUpdate')->name('usuario.avatar.update');
+    Route::delete('/perfil/interes/{id}', 'interesDelete')->name('usuario.interes.delete');
 });
 
 Route::prefix('/home')->controller(HomeController::class)->group(function () {
