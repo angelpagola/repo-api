@@ -11,5 +11,5 @@ class Escuela extends Model
 
     protected $table = 'escuelas';
     public $timestamps = false;
-    public $fillable = ['uuid', 'nombre', 'facultad_abrev'];
+    public $fillable = ['nombre', 'facultad_abrev'];
 }

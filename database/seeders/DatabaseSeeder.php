@@ -34,11 +34,11 @@ class DatabaseSeeder extends Seeder
         $this->call(MotivoSeeder::class);
 
         //Todo: Nivel 1
-        \App\Models\Estudiante::factory(10)->create();
+        \App\Models\Estudiante::factory(30)->create();
 
         //Todo: Nivel 2
         $this->call(UsuarioSeeder::class);
-        \App\Models\Proyecto::factory(40)->create();
+        \App\Models\Proyecto::factory(80)->create();
 
         //Todo: Nivel 3
         \App\Models\ProyectoTag::factory(120)->create();
