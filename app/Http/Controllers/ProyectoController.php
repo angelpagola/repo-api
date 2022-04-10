@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\storeProyecto;
 use App\Http\Requests\updateProyecto;
+use App\Models\Favorito;
 use App\Models\Proyecto;
 use App\Models\ProyectoTag;
 use App\Models\Valoracion;
@@ -118,6 +119,21 @@ class ProyectoController extends Controller
 
     }
 
+    public function darLike($proy_id, $user_id)
+    {
+        $valoracion = Valoracion::query()->where('proyecto_id', $proy_id)->where('usuario_id', $user_id)->first();
+
+        if ($valoracion) {
+            $valoracion->delete();
+        } else {
+            Valoracion::create([
+                "me_gusta" => true,
+                "proyecto_id" => $proy_id,
+                "usuario_id" => $user_id
+            ]);
+        }
+    }
+
     public function valoracion($proy_id, $user_id)
     {
         $proyecto = Proyecto::query()
@@ -134,6 +150,23 @@ class ProyectoController extends Controller
         return response()->json([], 204);
     }
 
+    // Para agregar o quitar un proyecto a Favoritos
+    public function agregarAFav($proy_id, $user_id)
+    {
+        $fav = Favorito::query()->where('proyecto_id', $proy_id)->where('usuario_id', $user_id)->first();
+
+        if ($fav) {
+            $fav->delete();
+        } else {
+            Favorito::create([
+                "fecha_agregacion" => now()->format('Y-m-d'),
+                "proyecto_id" => $proy_id,
+                "usuario_id" => $user_id
+            ]);
+        }
+    }
+
+    //Saber si un proyecto esta en los favoritos de un usuario
     public function favorito($proy_id, $user_id)
     {
         $proyecto = Proyecto::query()
