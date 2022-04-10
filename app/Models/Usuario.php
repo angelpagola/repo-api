@@ -25,9 +25,9 @@ class Usuario extends Model
         return $this->belongsToMany(Proyecto::class, 'valoraciones');
     }
 
-    public function favorito()
+    public function proyectos()
     {
-        return $this->belongsToMany(Proyecto::class, 'favoritos');
+        return $this->belongsToMany(Proyecto::class, 'favoritos')->withPivot('fecha_agregacion');
     }
 
     public function tag()

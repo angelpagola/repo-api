@@ -53,9 +53,9 @@ class Proyecto extends Model
         return $this->belongsToMany(Usuario::class, 'valoraciones')->withPivot('me_gusta')->where('me_gusta', false);
     }
 
-    public function favorito()
+    public function favoritos()
     {
-        return $this->belongsToMany(Usuario::class, 'favoritos');
+        return $this->belongsToMany(Usuario::class, 'favoritos')->withPivot('fecha_agregacion');
     }
 
     public function comentario()

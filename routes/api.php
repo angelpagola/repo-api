@@ -49,7 +49,8 @@ Route::prefix('/proyecto')->controller(ProyectoController::class)->group(functio
     Route::delete('/{id}', 'destroy')->name('proyecto.destroy');
 });
 
-/*Route::prefix('/favorito')->controller(FavoritoController::class)->group(function () {
-    Route::get('/', 'index')->name('favorito.index');
-    Route::get('/{id}', 'show')->name('favorito.show');
-});*/
+Route::prefix('/favorito')->controller(FavoritoController::class)->group(function () {
+    Route::get('/{usuario_id}', 'index')->name('favorito.index');
+    Route::post('/agregar/{proyecto_id}/{usuario_id}', 'store')->name('favorito.store');
+    Route::delete('/eliminar/{proyecto_id}/{usuario_id}', 'destroy')->name('favorito.destroy');
+});
