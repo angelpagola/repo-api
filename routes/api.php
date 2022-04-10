@@ -34,13 +34,15 @@ Route::prefix('/usuario')->controller(UsuarioController::class)->group(function 
 });
 
 Route::prefix('/home')->controller(HomeController::class)->group(function () {
-    Route::get('/', 'index')->name('home.index');
+    Route::get('/{id}', 'index')->name('home.index');
 });
 
 
 Route::prefix('/proyecto')->controller(ProyectoController::class)->group(function () {
-    Route::get('/{proyecto_id}', 'show')->name('proyecto.show');
+    Route::get('/like/{proy_id}/{user_id}', 'darLike')->name('proyecto.like');
+    Route::get('/fav/{proy_id}/{user_id}', 'agregarAFav')->name('proyecto.fav');
     Route::get('/valoracion/{proyecto_id}/{usuario_id}', 'valoracion')->name('proyecto.valoracion');
+    Route::get('/{proyecto_id}', 'show')->name('proyecto.show');
     Route::get('/favorito/{proyecto_id}/{usuario_id}', 'favorito')->name('proyecto.favorito');
     Route::get('/recomendacion/{proyecto_id}', 'recomendados')->name('proyecto.recomendados');
     Route::get('/usuario/{usuario}', 'index')->name('proyecto.index');

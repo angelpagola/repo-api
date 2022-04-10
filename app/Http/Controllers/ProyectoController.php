@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\storeProyecto;
 use App\Http\Requests\updateProyecto;
+use App\Models\Favorito;
 use App\Models\Proyecto;
 use App\Models\ProyectoTag;
 use App\Models\Usuario;
@@ -40,7 +41,6 @@ class ProyectoController extends Controller
                 'mensaje' => 'El estudiante no tiene proyectos por el momento'
             ], 200);
         }
-
     }
 
     public function show($proyecto_id)
@@ -94,12 +94,13 @@ class ProyectoController extends Controller
     {
         $proyectos = Proyecto::query()
             ->select('id', 'titulo', 'estudiante_id')
-            ->addSelect(['similitud' => ProyectoTag::select(DB::raw('count(*)'))
-                ->whereColumn('proyecto_id', 'proyectos.id')
-                ->whereIn('tag_id', function ($query) use ($proyecto_id) {
-                    $query->select('tag_id')->from('proyecto_tags')->where('proyecto_id', $proyecto_id);
-                })
-                ->take(1)
+            ->addSelect([
+                'similitud' => ProyectoTag::select(DB::raw('count(*)'))
+                    ->whereColumn('proyecto_id', 'proyectos.id')
+                    ->whereIn('tag_id', function ($query) use ($proyecto_id) {
+                        $query->select('tag_id')->from('proyecto_tags')->where('proyecto_id', $proyecto_id);
+                    })
+                    ->take(1)
             ])
             ->with('portada', 'estudiante:id', 'estudiante.usuario:usuario,estudiante_id')
             ->having('id', '<>', $proyecto_id)
@@ -109,17 +110,32 @@ class ProyectoController extends Controller
             ->get();
 
         return response()->json($proyectos, 200);
+    }
 
+    public function darLike($proy_id, $user_id)
+    {
+        $valoracion = Valoracion::query()->where('proyecto_id', $proy_id)->where('usuario_id', $user_id)->first();
+
+        if ($valoracion) {
+            $valoracion->delete();
+        } else {
+            Valoracion::create([
+                "me_gusta" => true,
+                "proyecto_id" => $proy_id,
+                "usuario_id" => $user_id
+            ]);
+        }
     }
 
     public function valoracion($proyecto_id, $usuario_id)
     {
         $proyecto = Proyecto::query()
             ->select('id')
-            ->addSelect(['por_usuario' => Valoracion::select('me_gusta')
-                ->whereColumn('proyecto_id', 'proyectos.id')
-                ->where('usuario_id', $usuario_id)
-                ->take(1)
+            ->addSelect([
+                'por_usuario' => Valoracion::select('me_gusta')
+                    ->whereColumn('proyecto_id', 'proyectos.id')
+                    ->where('usuario_id', $usuario_id)
+                    ->take(1)
             ])
             ->withCount(['likes', 'dislikes'])->find($proyecto_id);
         if ($proyecto)
@@ -128,7 +144,25 @@ class ProyectoController extends Controller
         return response()->json([], 204);
     }
 
+    // Para agregar o quitar un proyecto a Favoritos
+    public function agregarAFav($proy_id, $user_id)
+    {
+        $fav = Favorito::query()->where('proyecto_id', $proy_id)->where('usuario_id', $user_id)->first();
+
+        if ($fav) {
+            $fav->delete();
+        } else {
+            Favorito::create([
+                "fecha_agregacion" => now()->format('Y-m-d'),
+                "proyecto_id" => $proy_id,
+                "usuario_id" => $user_id
+            ]);
+        }
+    }
+
+    //Saber si un proyecto esta en los favoritos de un usuario
     public function favorito($proyecto_id, $usuario_id)
+
     {
         $proyecto = Proyecto::query()
             ->select('id')
