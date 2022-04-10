@@ -228,13 +228,14 @@ class ProyectoController extends Controller
     }
 
     //Saber si un proyecto esta en los favoritos de un usuario
-    public function favorito($proy_id, $user_id)
+    public function favorito($proyecto_id, $usuario_id)
+
     {
         $proyecto = Proyecto::query()
             ->select('id')
-            ->whereHas('favorito', function ($query) use ($user_id) {
-                $query->where('usuario_id', $user_id);
-            })->find($proy_id);
+            ->whereHas('favorito', function ($query) use ($usuario_id) {
+                $query->where('usuario_id', $usuario_id);
+            })->find($proyecto_id);
 
         return response()->json(["es_favorito" => (bool)$proyecto], 200);
     }
