@@ -9,6 +9,7 @@ use App\Models\Proyecto;
 use App\Models\ProyectoArchivo;
 use App\Models\ProyectoImagen;
 use App\Models\ProyectoTag;
+use App\Models\Reporte;
 use App\Models\Tag;
 use App\Models\Usuario;
 use App\Models\Valoracion;
@@ -238,5 +239,53 @@ class ProyectoController extends Controller
             })->find($proyecto_id);
 
         return response()->json(["es_favorito" => (bool)$proyecto], 200);
+    }
+
+    public function reportar(Request $request)
+    {
+        $rules = [
+            'motivos' => 'required|array|min:1',
+            'usuario_id' => "required|gt:0",
+            'proyecto_id' => "required|gt:0",
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'respuesta' => false,
+                'mensaje' => 'Error de validación', 'error' => $validator->errors()
+            ], 200);
+        }
+
+        foreach ($request->motivos as $motivo) {
+            $reporte_exists = Reporte::query()
+                ->where('motivo_id', $motivo)
+                ->where('usuario_id', $request->usuario_id)
+                ->where('proyecto_id', $request->proyecto_id)
+                ->first();
+
+            if (!$reporte_exists) {
+                Reporte::create([
+                    'motivo_id' => $motivo,
+                    'usuario_id' => $request->usuario_id,
+                    'proyecto_id' => $request->proyecto_id
+                ]);
+            }
+        }
+
+        $veces_reportado = Reporte::query()->select('id')->distinct('usuario_id')
+            ->where('proyecto_id', $request->proyecto_id)->get();
+
+        $estado = false;
+        if (count($veces_reportado) > 10) {
+            $estado = true;
+        }
+
+        return response()->json([
+            'respuesta' => $estado,
+            'mensaje' => '¡Gracias por avisarnos! Si vemos que este contenido infringe nuestras Normas de la Comunidad, lo retiraremos.'
+        ], 201);
+
     }
 }

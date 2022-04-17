@@ -49,6 +49,7 @@ Route::prefix('/proyecto')->controller(ProyectoController::class)->group(functio
     Route::post('/', 'store')->name('proyecto.store');
     Route::put('/{id}', 'update')->name('proyecto.update');
     Route::delete('/{id}', 'destroy')->name('proyecto.destroy');
+    Route::post('/reportar/', 'reportar')->name('proyecto.reportar');
 });
 
 Route::prefix('/favorito')->controller(FavoritoController::class)->group(function () {
