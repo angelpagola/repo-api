@@ -11,22 +11,30 @@ use Illuminate\Http\Request;
 class FavoritoController extends Controller
 {
 
-    public function index($usuario_id)
+    public function index(Request $request, $usuario)
     {
-        $usuario = Usuario::query()->find($usuario_id);
+        $usuario = Usuario::query()->where('usuario', $usuario)->first();
+        $search = $request->get('buscar') ?? "";
 
         if (!$usuario)
             return response()->json(["respuesta" => false, "mensaje" => 'El usuario no existe'], 200);
 
         $favoritos = Proyecto::query()
             ->select('id', 'uuid', 'titulo', 'estudiante_id')
-            ->with('estudiante:id,apellidos,nombres,avatar', 'estudiante.usuario:usuario,estudiante_id', 'portada:id,link_imagen,proyecto_id', 'tags')
-            ->whereHas('favoritos', function ($query) use ($usuario_id) {
-                $query->where('usuario_id', $usuario_id);
+            ->addSelect(['agregado_el' => Favorito::select('fecha_agregacion')
+                ->whereColumn('proyecto_id', 'proyectos.id')
+                ->where('usuario_id', $usuario->id)
+                ->take(1)
+            ])
+            ->with('estudiante:id,apellidos,nombres,avatar', 'estudiante.usuario:usuario,estudiante_id', 'portada:id,link_imagen,proyecto_id')
+            ->whereHas('favoritos', function ($query) use ($usuario) {
+                $query->where('usuario_id', $usuario->id);
             })
+            ->where('titulo', 'like', '%' . $search . '%')
+            ->orderBy('agregado_el', 'desc')
             ->get();
 
-        return response()->json($favoritos, 200);
+        return response()->json(["respuesta" => true, "mensaje" => $favoritos], 200);
     }
 
     public function store($proyecto_id, $usuario_id)

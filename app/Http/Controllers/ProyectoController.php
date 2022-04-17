@@ -20,30 +20,38 @@ use Illuminate\Support\Str;
 
 class ProyectoController extends Controller
 {
-    public function index(Usuario $usuario)
+    public function index(Request $request, $usuario)
     {
-        if (!$usuario) {
+        $user = Usuario::query()->where('usuario', $usuario)->first();
+        $search = $request->get('buscar') ?? "";
+
+        if (!$user) {
             return response()->json([
                 'respuesta' => false,
                 'mensaje' => 'No existe ningún usuario con este id en el sistema.'
             ], 200);
         }
 
-        $callback = Proyecto::query()
+        $proyecto = Proyecto::query()
             ->select('id', 'uuid', 'titulo', 'fecha_publicacion', 'estudiante_id')
-            ->with('estudiante:id,apellidos,nombres,avatar', 'estudiante.usuario:usuario,estudiante_id', 'portada:id,link_imagen,proyecto_id', 'tags:id,nombre');
+            ->with('estudiante:id,apellidos,nombres,avatar', 'estudiante.usuario:id,usuario,estudiante_id', 'portada:id,link_imagen,proyecto_id')
+            ->with(['tags' => function ($query) {
+                $query->limit(4);
+            }])
+            ->where('titulo', 'like', '%' . $search . '%')
+            ->where('estudiante_id', $user->estudiante_id)
+            ->orderBy('fecha_publicacion', 'desc')
+            ->get();
 
-        $proyecto = $callback->where('estudiante_id', $usuario->estudiante_id)->get();
-
-        if ($proyecto) {
+        if (count($proyecto)) {
             return response()->json([
                 'respuesta' => true,
                 'mensaje' => $proyecto
             ], 200);
         } else {
             return response()->json([
-                'respuesta' => true,
-                'mensaje' => 'El estudiante no tiene proyectos por el momento'
+                'respuesta' => false,
+                'mensaje' => 'No se encontró ningún proyecto.'
             ], 200);
         }
     }
@@ -51,7 +59,7 @@ class ProyectoController extends Controller
     public function show($proyecto_id)
     {
         $proyecto = Proyecto::query()
-            ->with('estudiante', 'estudiante.escuela', 'tags', 'portadas', 'proyectoArchivo')
+            ->with('estudiante', 'estudiante.usuario', 'estudiante.escuela', 'tags', 'portadas', 'proyectoArchivo')
             ->where('id', $proyecto_id)
             ->first();
 
@@ -229,14 +237,35 @@ class ProyectoController extends Controller
 
     //Saber si un proyecto esta en los favoritos de un usuario
     public function favorito($proyecto_id, $usuario_id)
-
     {
         $proyecto = Proyecto::query()
             ->select('id')
-            ->whereHas('favorito', function ($query) use ($usuario_id) {
+            ->whereHas('favoritos', function ($query) use ($usuario_id) {
                 $query->where('usuario_id', $usuario_id);
             })->find($proyecto_id);
 
         return response()->json(["es_favorito" => (bool)$proyecto], 200);
+    }
+
+    // Obtener los datos basicos del usuario: avatar, nombres, contacto
+    public function datosUsuario($usuario)
+    {
+        $user = Usuario::query()
+            ->with(['estudiante' => function ($query) {
+                $query->withCount('proyecto');
+            }, 'estudiante.escuela'])
+            ->where('usuario', $usuario)->first();
+
+        if (!$user) {
+            return response()->json([
+                'respuesta' => false,
+                'mensaje' => 'No existe ningún usuario con este id en el sistema.'
+            ], 200);
+        }
+
+        return response()->json([
+            'respuesta' => true,
+            'mensaje' => $user
+        ], 200);
     }
 }
