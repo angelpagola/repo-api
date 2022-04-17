@@ -48,6 +48,6 @@ class Usuario extends Model
 
     public function reporte()
     {
-        return $this->belongsToMany(Proyecto::class, 'reportes');
+        return $this->belongsToMany(Proyecto::class, 'reportes')->withPivot('id');
     }
 }

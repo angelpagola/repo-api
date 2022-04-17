@@ -35,6 +35,8 @@ Route::prefix('/usuario')->controller(UsuarioController::class)->group(function 
 
 Route::prefix('/home')->controller(HomeController::class)->group(function () {
     Route::get('/{id}', 'index')->name('home.index');
+    Route::post('/buscar/', 'buscar')->name('proyecto.buscar');
+
 });
 
 
@@ -47,9 +49,10 @@ Route::prefix('/proyecto')->controller(ProyectoController::class)->group(functio
     Route::get('/recomendacion/{proyecto_id}', 'recomendados')->name('proyecto.recomendados');
     Route::get('/usuario/{usuario}', 'index')->name('proyecto.index');
     Route::get('/userinfo/{usuario}', 'datosUsuario')->name('proyecto.userinfo');
-    Route::post('/', 'store')->name('proyecto.store');
-    Route::put('/{id}', 'update')->name('proyecto.update');
-    Route::delete('/{id}', 'destroy')->name('proyecto.destroy');
+    Route::post('/crear', 'store')->name('proyecto.store');
+    Route::post('/editar/{proyecto_id}', 'update')->name('proyecto.update');
+    Route::delete('/eliminar/{proyecto_id}', 'destroy')->name('proyecto.destroy');
+    Route::post('/reportar/', 'reportar')->name('proyecto.reportar');
 });
 
 Route::prefix('/favorito')->controller(FavoritoController::class)->group(function () {
