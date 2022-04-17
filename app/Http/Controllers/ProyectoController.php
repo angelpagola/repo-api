@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\storeProyecto;
 use App\Http\Requests\updateProyecto;
+use App\Models\Comentario;
 use App\Models\Favorito;
 use App\Models\Proyecto;
 use App\Models\ProyectoArchivo;
@@ -140,22 +141,94 @@ class ProyectoController extends Controller
         ], 201);
     }
 
-    public function update(updateProyecto $request, Proyecto $proyecto)
+    public function update(Request $request, $proyecto_id)
     {
+        /*Por el momento aún no se pueden aditar los documentos e imagenes*/
+        $rules = [
+            "titulo" => "required|max:255",
+            "resumen" => "required",
+            'usuario_id' => "required|gt:0",
+            'tags' => 'required|array|min:2',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'respuesta' => false,
+                'mensaje' => 'Error de validación', 'error' => $validator->errors()
+            ], 200);
+        }
+
+        $usuario = Usuario::find($request->usuario_id);
+
+        if (!$usuario) {
+            return response()->json([
+                'respuesta' => false,
+                'mensaje' => 'No existe ningún usuario con este id en el sistema.'
+            ], 200);
+        }
+
+        $proyecto = Proyecto::find($proyecto_id);
+
+        if (!$proyecto) {
+            return response()->json([
+                'respuesta' => false,
+                'mensaje' => 'No existe ningún proyecto con este id en el sistema.'
+            ], 200);
+        }
+
         $proyecto->update($request->all());
+
+        $proyecto->update([
+            'titulo' => $request->titulo,
+            'resumen' => $request->resumen,
+        ]);
+
+        $tags_id = [];
+        foreach ($request->tags as $tag) {
+            $tag_exists = Tag::query()->where('nombre', $tag)->first();
+            if (!$tag_exists) {
+                $tag_exists = Tag::create(['nombre' => $tag]);
+            }
+            $tags_id[] = $tag_exists->id;
+        }
+
+        $usuario->intereses()->attach($tags_id);
+
+        ProyectoTag::where('proyecto_id', $proyecto_id)->delete();
+        $proyecto->tags()->attach($tags_id);
+
         return response()->json([
             'respuesta' => true,
             'mensaje' => 'Registro Actualizado Correctamente'
         ], 201);
     }
 
-    public function destroy($id)
+    /*Este proceso es irreversible*/
+    public function destroy($proyecto_id)
     {
-        $proyecto = Proyecto::destroy($id);
-        if (is_null($proyecto)) {
-            return response()->json(['mensaje' => 'Proyecto No Encontrado'], 404);
+        $proyecto = Proyecto::find($proyecto_id);
+        if (!$proyecto) {
+            return response()->json([
+                'respuesta' => false,
+                'mensaje' => 'No existe ningún proyecto con este id en el sistema.'
+            ], 200);
         }
-        return response()->json(null, 204);
+
+        Valoracion::where('proyecto_id', $proyecto_id)->delete();
+        Favorito::where('proyecto_id', $proyecto_id)->delete();
+        Comentario::where('proyecto_id', $proyecto_id)->delete();
+        Reporte::where('proyecto_id', $proyecto_id)->delete();
+        ProyectoTag::where('proyecto_id', $proyecto_id)->delete();
+        ProyectoImagen::where('proyecto_id', $proyecto_id)->delete();
+        ProyectoArchivo::where('proyecto_id', $proyecto_id)->delete();
+        $proyecto->delete();
+
+        return response()->json([
+            'respuesta' => true,
+            'mensaje' => 'Registro Eliminado Correctamente'
+        ], 200);
     }
 
     public function recomendados($proyecto_id)
