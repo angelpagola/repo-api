@@ -22,7 +22,9 @@ class HomeController extends Controller
                     $query->select('tag_id')->from('tema_interes')->where('usuario_id', $id);
                 })
                 ->take(1)
-            ])->having('similitud', '>', 0);
+            ])->where('estudiante_id', '<>', function ($query) use ($id) {
+                $query->select('estudiante_id')->from('usuarios')->where('id', $id);
+            })->having('similitud', '>', 0);
         }
 
         $proyectos = $proyectos->inRandomOrder()
@@ -63,32 +65,22 @@ class HomeController extends Controller
             ->select('id', 'uuid', 'titulo', 'estudiante_id')
             ->with('estudiante:id,apellidos,nombres,avatar', 'estudiante.usuario:usuario,estudiante_id', 'portada:id,link_imagen,proyecto_id');
 
-        /*if ($request->has('fecha_desde') && $request->has('fecha_hasta')) {
-            $proyectos = $proyectos->whereBetween('fecha_publicacion', [$request->fecha_desde, $request->fecha_hasta]);
-            if ($request->has('buscar')) {
-                $proyectos = $proyectos->where('titulo', 'like', '%' . $request->buscar . '%')
-                    ->orWhere('resumen', 'like', '%' . $request->buscar . '%');
-            }
-        }*/
+        if ($request->has('inicio') && $request->has('fin')) {
+            $proyectos = $proyectos->whereBetween('fecha_publicacion', [$request->inicio, $request->fin]);
+        }
 
-        /*if (count($request->escuelas)) {
-            foreach ($request->escueslas as $escuela) {
-                $proyectos = $proyectos->orWhereHas('estudiante', function ($query) use ($escuela) {
-                    return $query
-                        ->where('escuela_id', $escuela);
-                });
-            }
-        }*/
+        if ($request->has('buscar')) {
+            $proyectos = $proyectos->where(function ($query) use ($request) {
+                $query->where('titulo', 'like', '%' . $request->buscar . '%')/* ->orWhere('resumen', 'like', '%' . $request->buscar . '%')*/
+                ;
+            });
+        }
 
-        /* if ($usuario_id > 0) {
-             $proyectos = $proyectos->addSelect(['similitud' => ProyectoTag::select(DB::raw('count(*)'))
-                 ->whereColumn('proyecto_id', 'proyectos.id')
-                 ->whereIn('tag_id', function ($query) use ($usuario_id) {
-                     $query->select('tag_id')->from('tema_interes')->where('usuario_id', $usuario_id);
-                 })
-                 ->take(1)
-             ])->having('similitud', '>', 0);
-         }*/
+        if ($request->has('escuelas') and count($request->escuelas)) {
+            $proyectos = $proyectos->whereHas('estudiante', function ($query) use ($request) {
+                return $query->whereIn('escuela_id', $request->escuelas);
+            });
+        }
 
         $proyectos = $proyectos->inRandomOrder()
             ->limit(14)

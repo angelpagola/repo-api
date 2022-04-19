@@ -39,7 +39,6 @@ Route::prefix('/home')->controller(HomeController::class)->group(function () {
 
 });
 
-
 Route::prefix('/proyecto')->controller(ProyectoController::class)->group(function () {
     Route::get('/like/{proy_id}/{user_id}', 'darLike')->name('proyecto.like');
     Route::get('/fav/{proy_id}/{user_id}', 'agregarAFav')->name('proyecto.fav');
