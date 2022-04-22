@@ -67,4 +67,10 @@ class Proyecto extends Model
     {
         return $this->belongsToMany(Usuario::class, 'reportes');
     }
+
+    // Es similar a reporte
+    public function reportes()
+    {
+        return $this->hasMany(Reporte::class);
+    }
 }

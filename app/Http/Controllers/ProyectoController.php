@@ -6,6 +6,7 @@ use App\Http\Requests\storeProyecto;
 use App\Http\Requests\updateProyecto;
 use App\Models\Comentario;
 use App\Models\Favorito;
+use App\Models\Motivo;
 use App\Models\Proyecto;
 use App\Models\ProyectoArchivo;
 use App\Models\ProyectoImagen;
@@ -62,6 +63,9 @@ class ProyectoController extends Controller
     {
         $proyecto = Proyecto::query()
             ->with('estudiante', 'estudiante.usuario', 'estudiante.escuela', 'tags', 'portadas', 'proyectoArchivo')
+            ->with(['reportes' => function ($query) {
+                $query->select('usuario_id', 'proyecto_id')->orderBy('motivo_id');
+            }])
             ->where('id', $proyecto_id)
             ->first();
 
@@ -343,6 +347,7 @@ class ProyectoController extends Controller
         ], 200);
     }
 
+    // Funcion para reportar un proyecto, si ya alcanzo los 10 usuarios se elimina
     public function reportar(Request $request)
     {
         $rules = [
@@ -354,39 +359,54 @@ class ProyectoController extends Controller
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            return response()->json([
-                'respuesta' => false,
-                'mensaje' => 'Error de validación', 'error' => $validator->errors()
-            ], 200);
+            return response()->json(['respuesta' => false, 'mensaje' => 'Error de validación', 'error' => $validator->errors()]);
         }
 
+        $proyecto = Proyecto::find($request->proyecto_id);
+
+        if (!$proyecto) {
+            return response()->json(['respuesta' => false, 'mensaje' => 'Error, este proyecto no existe.']);
+        }
+
+        $data = [];
         foreach ($request->motivos as $motivo) {
             $reporte_exists = Reporte::query()
                 ->where('motivo_id', $motivo)
                 ->where('usuario_id', $request->usuario_id)
                 ->where('proyecto_id', $request->proyecto_id)
-                ->first();
+                ->exists();
 
             if (!$reporte_exists) {
-                Reporte::create([
-                    'motivo_id' => $motivo,
-                    'usuario_id' => $request->usuario_id,
-                    'proyecto_id' => $request->proyecto_id
-                ]);
+                $data[] = ['motivo_id' => $motivo, 'usuario_id' => $request->usuario_id, 'proyecto_id' => $request->proyecto_id];
             }
         }
 
-        $veces_reportado = Reporte::query()->select('id')->distinct('usuario_id')
+        if (count($data)) {
+            Reporte::insert($data);
+        }
+
+        $veces_reportado = Reporte::query()->select('usuario_id')->distinct()
             ->where('proyecto_id', $request->proyecto_id)->get();
+        $veces_reportado = count($veces_reportado);
 
         $estado = false;
-        if (count($veces_reportado) > 10) {
+        if ($veces_reportado >= 10) {
             $estado = true;
+            $this->destroy($request->proyecto_id);
         }
 
         return response()->json([
             'respuesta' => $estado,
             'mensaje' => '¡Gracias por avisarnos! Si vemos que este contenido infringe nuestras Normas de la Comunidad, lo retiraremos.'
         ], 201);
+
+    }
+
+    // Lista de motivos para reportar un proyecto
+    public function motivos()
+    {
+        $motivos = Motivo::query()->orderBy('nombre')->get();
+
+        return response()->json($motivos, 200);
     }
 }
