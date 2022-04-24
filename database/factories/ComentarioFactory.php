@@ -18,10 +18,15 @@ class ComentarioFactory extends Factory
      */
     public function definition()
     {
+        $fecha = $this->faker->dateTimeBetween('-18 months', 'now');
+
         return [
-            'mensaje' => $this->faker->sentence(1, 10),
+            'mensaje' => $this->faker->sentence(15),
             'usuario_id' => Usuario::inRandomOrder()->first()->id,
-            'proyecto_id' => Proyecto::inRandomOrder()->first()->id
+            'proyecto_id' => Proyecto::inRandomOrder()->first()->id,
+            'created_at' => $fecha,
+            'updated_at' => $fecha,
         ];
+
     }
 }

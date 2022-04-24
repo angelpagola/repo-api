@@ -18,10 +18,14 @@ class ValoracionFactory extends Factory
      */
     public function definition()
     {
+        $fecha = $this->faker->dateTimeBetween('-18 months', 'now');
+
         return [
-            'me_gusta' => $this->faker->boolean,
+            'me_gusta' => true,
             'usuario_id' => Usuario::inRandomOrder()->first()->id,
-            'proyecto_id' => Proyecto::inRandomOrder()->first()->id
+            'proyecto_id' => Proyecto::inRandomOrder()->first()->id,
+            'created_at' => $fecha,
+            'updated_at' => $fecha,
         ];
     }
 }

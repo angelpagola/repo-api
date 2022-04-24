@@ -9,11 +9,13 @@ use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
+    // TODO: Ok
     public function index(Request $request, $id)
     {
         $proyectos = Proyecto::query()
-            ->select('id', 'uuid', 'titulo', 'estudiante_id')
-            ->with('estudiante:id,apellidos,nombres,avatar', 'estudiante.usuario:usuario,estudiante_id', 'portada:id,link_imagen,proyecto_id');
+            ->select('id', 'titulo', 'usuario_id')
+            ->with('usuario:id,usuario,avatar,estudiante_id', 'usuario.estudiante:id,apellidos,nombres', 'portada:id,link_imagen,proyecto_id')
+            ->withCount('likes');
 
         if ($id > 0) {
             $proyectos = $proyectos->addSelect(['similitud' => ProyectoTag::select(DB::raw('count(*)'))
@@ -22,9 +24,8 @@ class HomeController extends Controller
                     $query->select('tag_id')->from('tema_interes')->where('usuario_id', $id);
                 })
                 ->take(1)
-            ])->where('estudiante_id', '<>', function ($query) use ($id) {
-                $query->select('estudiante_id')->from('usuarios')->where('id', $id);
-            })->having('similitud', '>', 0);
+            ])->where('usuario_id', '<>', $id)
+                ->having('similitud', '>', 0);
         }
 
         $proyectos = $proyectos->inRandomOrder()
@@ -53,7 +54,7 @@ class HomeController extends Controller
         }
     }
 
-    /*    Aún está en desarrollo ...*/
+    //
     public function buscar(Request $request)
     {
         //$request->buscar
@@ -62,42 +63,34 @@ class HomeController extends Controller
         //$request->escuelas[]
 
         $proyectos = Proyecto::query()
-            ->select('id', 'uuid', 'titulo', 'estudiante_id')
-            ->with('estudiante:id,apellidos,nombres,avatar', 'estudiante.usuario:usuario,estudiante_id', 'portada:id,link_imagen,proyecto_id');
+            ->select('id', 'titulo', 'usuario_id')
+            ->with('usuario:id,usuario,avatar,estudiante_id', 'usuario.estudiante:id,apellidos,nombres,escuela_id', 'portada:id,link_imagen,proyecto_id')
+            ->withCount('likes');
 
         if ($request->has('inicio') && $request->has('fin')) {
-            $proyectos = $proyectos->whereBetween('fecha_publicacion', [$request->inicio, $request->fin]);
+            $proyectos = $proyectos->whereBetween('created_at', [$request->inicio, $request->fin]);
         }
 
         if ($request->has('buscar')) {
             $proyectos = $proyectos->where(function ($query) use ($request) {
-                $query->where('titulo', 'like', '%' . $request->buscar . '%')/* ->orWhere('resumen', 'like', '%' . $request->buscar . '%')*/
-                ;
+                $query->where('titulo', 'like', '%' . $request->buscar . '%')
+                    ->orWhere('resumen', 'like', '%' . $request->buscar . '%');
             });
         }
 
         if ($request->has('escuelas') and count($request->escuelas)) {
-            $proyectos = $proyectos->whereHas('estudiante', function ($query) use ($request) {
-                return $query->whereIn('escuela_id', $request->escuelas);
+            $proyectos = $proyectos->whereHas('usuario.estudiante', function ($query) use ($request) {
+                $query->whereIn('escuela_id', $request->escuelas);
             });
         }
 
-        $proyectos = $proyectos->inRandomOrder()
-            ->limit(14)
-            ->get();
+        $proyectos = $proyectos->inRandomOrder()->limit(14)->get();
 
-        if ($proyectos) {
-            return response()->json([
-                'respuesta' => true,
-                'mensaje' => $proyectos
-            ], 200);
-
-        } else {
-            return response()->json([
-                'respuesta' => false,
-                'mensaje' => 'No existe ningún proyectos para mostrar'
-            ], 200);
+        if (!$proyectos) {
+            return response()->json(['respuesta' => false, 'mensaje' => 'No existe ningún proyectos para mostrar']);
         }
+
+        return response()->json(['respuesta' => true, 'mensaje' => $proyectos]);
 
     }
 }

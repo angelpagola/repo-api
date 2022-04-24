@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 
 class UsuarioController extends Controller
 {
+    // TODO: Ok
     public function login(Request $request)
     {
         $callback = Usuario::query()
@@ -22,26 +23,27 @@ class UsuarioController extends Controller
 
         $usuario = $callback->first();
 
-        if ($usuario) {
-            if (Hash::check($request->password, $usuario->password)) {
-                return response()->json([
-                    'respuesta' => true,
-                    'mensaje' => $callback->select('id', 'usuario', 'estudiante_id')->with('estudiante:id,nombres,apellidos,avatar')->first()
-                ], 200);
-            } else {
-                return response()->json([
-                    'respuesta' => false,
-                    'mensaje' => 'Las credenciales proporcionados son erroneas.'
-                ], 200);
-            }
-        } else {
+        if (!$usuario) {
             return response()->json([
                 'respuesta' => false,
-                'mensaje' => 'No existe ningún usuario con estas credenciales en el sistema.'
-            ], 200);
+                'mensaje' => 'No existe ningún usuario activo con estas credenciales en el sistema.'
+            ]);
         }
+
+        if (!Hash::check($request->password, $usuario->password)) {
+            return response()->json([
+                'respuesta' => false,
+                'mensaje' => 'Las credenciales proporcionados son erroneas.'
+            ]);
+        }
+
+        return response()->json([
+            'respuesta' => true,
+            'mensaje' => $callback->select('id', 'usuario', 'avatar', 'estudiante_id')->with('estudiante:id,nombres,apellidos')->first()
+        ]);
     }
 
+    // TODO: Ok
     public function signup(Request $request)
     {
         $rules = [
@@ -62,11 +64,10 @@ class UsuarioController extends Controller
             return response()->json([
                 'respuesta' => false,
                 'mensaje' => 'Error de validación', 'error' => $validator->errors()
-            ], 200);
+            ]);
         }
 
         $estudiante = Estudiante::create([
-            'uuid' => Str::uuid(),
             'nombres' => $request->nombres,
             'apellidos' => $request->apellidos,
             'correo' => $request->correo,
@@ -75,11 +76,17 @@ class UsuarioController extends Controller
             'escuela_id' => $request->escuela_id,
         ]);
 
+        $nombre_usuario = strtolower($request->username);
+        $nombre_usuario = str_replace(" ", "_", $nombre_usuario);
+        $nombre_usuario = str_replace(".", "", $nombre_usuario);
+        $nombre_usuario = str_replace("/", "", $nombre_usuario);
+        $nombre_usuario = str_replace("=", "", $nombre_usuario);
+
         $usuario = Usuario::create([
             'uuid' => Str::uuid(),
-            'usuario' => strtolower(str_replace(" ", "_", $request->username)),
+            'usuario' => $nombre_usuario,
             'password' => Hash::make($request->password),
-            'activo' => 1,
+            'activo' => true,
             'estudiante_id' => $estudiante->id
         ]);
 
@@ -88,20 +95,23 @@ class UsuarioController extends Controller
         return response()->json([
             'respuesta' => true,
             'mensaje' => Usuario::query()
-                ->select("id", "usuario", "estudiante_id")
-                ->with('estudiante:id,nombres,apellidos,avatar')->find($usuario->id)
+                ->select("id", "usuario", "estudiante_id", "avatar")
+                ->with('estudiante:id,nombres,apellidos')->find($usuario->id)
         ], 201);
     }
 
-    public function usuarioUpdate(Request $request, Usuario $usuario)
+    // TODO: Ok
+    public function usuarioUpdate(Request $request, $usuario_id)
     {
+        $usuario = Usuario::find($usuario_id);
+
         if (!$usuario) {
             return response()->json([
                 'respuesta' => false,
                 'mensaje' => 'No existe ningún usuario con este id en el sistema.'
-            ], 200);
+            ]);
         }
-      
+
         $rules = [
             "nombres" => "required|max:40",
             "apellidos" => "required|max:40",
@@ -117,24 +127,7 @@ class UsuarioController extends Controller
             return response()->json([
                 'respuesta' => false,
                 'mensaje' => 'Error de validación', 'error' => $validator->errors()
-            ], 200);
-        } else {
-
-            $estudiante = Estudiante::find($usuario->estudiante_id);
-
-            $estudiante->update([
-                'nombres' => $request->nombres,
-                'apellidos' => $request->apellidos,
-                'correo' => $request->correo,
-                'telefono' => $request->telefono,
-                'linkedin' => $request->linkedin,
-                'escuela_id' => $request->escuela_id,
             ]);
-
-            return response()->json([
-                'respuesta' => true,
-                'mensaje' => 'Datos de Usurio Editado Correctamente'
-            ], 201);
         }
 
         $estudiante = Estudiante::find($usuario->estudiante_id);
@@ -150,11 +143,11 @@ class UsuarioController extends Controller
 
         return response()->json([
             'respuesta' => true,
-            'mensaje' => 'Datos de Usuario Editado Correctamente'
+            'mensaje' => 'Datos de Usurio Editado Correctamente'
         ], 201);
-
     }
 
+    // TODO: Ok
     public function show($usuario_id)
     {
         $usuario = Usuario::query()
@@ -175,22 +168,23 @@ class UsuarioController extends Controller
             "correo" => $usuario->estudiante->correo,
             "telefono" => $usuario->estudiante->telefono,
             "linkedin" => $usuario->estudiante->linkedin,
-        ]], 200);
+        ]]);
     }
 
+    // TODO: Ok
     public function avatar($usuario_id)
     {
         $avatar = Usuario::query()
-            ->select('id', 'estudiante_id')
-            ->with('estudiante:id,avatar')
+            ->select('avatar')
             ->find($usuario_id);
 
         if ($avatar)
-            return response()->json(["respuesta" => true, "mensaje" => $avatar->estudiante->avatar], 200);
+            return response()->json(["respuesta" => true, "mensaje" => $avatar->avatar]);
 
-        return response()->json(["respuesta" => false, "mensaje" => "No hay ningun usuario con este ID"], 204);
+        return response()->json(["respuesta" => false, "mensaje" => "No hay ningún usuario con este ID"]);
     }
 
+    // TODO: Ok
     public function interes($usuario_id)
     {
         $temas = Usuario::query()
@@ -199,19 +193,21 @@ class UsuarioController extends Controller
             ->find($usuario_id);
 
         if ($temas)
-            return response()->json(["respuesta" => true, "mensaje" => $temas->tag], 200);
+            return response()->json(["respuesta" => true, "mensaje" => $temas->intereses]);
 
         return response()->json(["respuesta" => false, "mensaje" => "No hay ningun usuario con este ID"], 204);
     }
 
-    public function avatarUpdate(Request $request, Usuario $usuario)
+    // TODO: Ok
+    public function avatarUpdate(Request $request, $usuario_id)
     {
+        $usuario = Usuario::find($usuario_id);
 
         if (!$usuario) {
             return response()->json([
                 'respuesta' => false,
                 'mensaje' => 'No existe ningún usuario con este id en el sistema.'
-            ], 200);
+            ]);
         }
 
         $rules = [
@@ -224,55 +220,36 @@ class UsuarioController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'respuesta' => false,
-                'mensaje' => 'Error de validación ' . $usuario->id,
+                'mensaje' => 'Error de validación ',
                 'error' => $validator->errors(),
-            ], 200);
-        }
-
-        if ($request->hasFile('avatar')) {
-
-            $rutaCarpeta = 'public/avatars';
-
-            //verificar si existe la carpeta public/storage/avatars, crear si no existe
-            if (!Storage::exists($rutaCarpeta)) {
-                Storage::makeDirectory($rutaCarpeta);
-            }
-
-            $nombreArchivo = $request->file('avatar')->getClientOriginalName();
-
-            $existe = Storage::disk('public')->exists('avatars/' . $nombreArchivo);
-
-            $num = 0;
-            if ($existe) {
-                $aux = $nombreArchivo;
-                while ($existe) {
-                    $num++;
-                    $aux = $num . '_' . $aux;
-                    $existe = Storage::disk('public')->exists('storage/avatars/' . $aux);
-                    $aux = $nombreArchivo;
-                }
-                $nombreArchivo = $num . '_' . $nombreArchivo;
-            }
-
-            $url = 'storage/avatars/';
-            $request->file('avatar')->storeAs($rutaCarpeta, $nombreArchivo);
-
-            $estudiante = Estudiante::find($usuario->estudiante_id);
-
-            $link_avatar = asset($url . $nombreArchivo);
-
-            $estudiante->update([
-                "avatar" => $link_avatar
             ]);
-
-            return response()->json([
-                'respuesta' => true,
-                'mensaje' => $link_avatar
-            ], 201);
         }
 
+        $rutaCarpeta = 'public/avatars';
+
+        //verificar si existe la carpeta public/storage/avatars, crear si no existe
+        if (!Storage::exists($rutaCarpeta)) {
+            Storage::makeDirectory($rutaCarpeta);
+        }
+
+        $nombreArchivo = 'repotweb_avatar_' . $usuario->id . '_' . time() . rand(1, 99) . '.' . $request->file('avatar')->getClientOriginalExtension();
+
+        $url = 'storage/avatars/';
+        $request->file('avatar')->storeAs($rutaCarpeta, $nombreArchivo);
+
+        $link_avatar = asset($url . $nombreArchivo);
+
+        $usuario->update([
+            "avatar" => $link_avatar
+        ]);
+
+        return response()->json([
+            'respuesta' => true,
+            'mensaje' => $link_avatar
+        ], 201);
     }
 
+    // TODO: Ok
     public function interesDelete($tag_id)
     {
         $interes = TemaInteres::query()
@@ -282,7 +259,7 @@ class UsuarioController extends Controller
             $interes->delete();
             return response()->json([
                 'respuesta' => true,
-                'mensaje' => 'Tema Interes del Usuario Eliminado Correctamente'
+                'mensaje' => 'Este tema ya no es del interes del usuario.'
             ], 201);
         } else {
             return response()->json([

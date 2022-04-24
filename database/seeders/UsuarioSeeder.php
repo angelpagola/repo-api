@@ -15,6 +15,7 @@ class UsuarioSeeder extends Seeder
      */
     public function run()
     {
+        $url = 'storage/avatars/';
         $password = Hash::make('12345678');
 
         $usuarios = [
@@ -22,6 +23,7 @@ class UsuarioSeeder extends Seeder
                 'uuid' => '4996bb3a-0c4e-451b-9c55-95315e61c9a0',
                 'usuario' => 'estudiante1',
                 'password' => $password,
+                'avatar' => asset($url . $this->faker->image('public/storage/avatars', 640, 480, null, false)),
                 'activo' => 1,
                 'estudiante_id' => 1
             ],
@@ -29,6 +31,7 @@ class UsuarioSeeder extends Seeder
                 'uuid' => '600c7f89-8226-4293-b52f-2184cfe1a3d3',
                 'usuario' => 'estudiante2',
                 'password' => $password,
+                'avatar' => asset($url . $this->faker->image('public/storage/avatars', 640, 480, null, false)),
                 'activo' => 1,
                 'estudiante_id' => 2
             ],

@@ -2,8 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Curso;
-use App\Models\Estudiante;
+use App\Models\Usuario;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,12 +17,15 @@ class ProyectoFactory extends Factory
      */
     public function definition()
     {
+        $fecha = $this->faker->dateTimeBetween('-18 months', 'now');
+
         return [
             'uuid' => $this->faker->uuid,
-            'titulo' => $this->faker->sentence(10),
+            'titulo' => $this->faker->sentence(15),
             'resumen' => $this->faker->paragraph() . " " . $this->faker->paragraph(),
-            'fecha_publicacion' => $this->faker->dateTimeBetween('-6 months', 'now')->format("Y-m-d"),
-            'estudiante_id' => Estudiante::inRandomOrder()->first()->id,
+            'usuario_id' => Usuario::inRandomOrder()->first()->id,
+            'created_at' => $fecha,
+            'updated_at' => $fecha,
         ];
     }
 }

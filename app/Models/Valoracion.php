@@ -10,7 +10,7 @@ class Valoracion extends Model
     use HasFactory;
 
     protected $table = 'valoraciones';
-    public $timestamps = false;
+//    public $timestamps = false;
     public $fillable = ['me_gusta', 'usuario_id', 'proyecto_id'];
 
 }

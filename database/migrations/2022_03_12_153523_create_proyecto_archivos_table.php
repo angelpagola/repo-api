@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('proyecto_archivos', function (Blueprint $table) {
             $table->id();
+            $table->string('nombre');
             $table->string('link_archivo');
             $table->foreignId('proyecto_id')->constrained('proyectos')
                 ->cascadeOnUpdate()

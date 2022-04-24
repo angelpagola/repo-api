@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class FavoritoController extends Controller
 {
-
+    // TODO: Ok
     public function index(Request $request, $usuario)
     {
         $usuario = Usuario::query()->where('usuario', $usuario)->first();
@@ -20,13 +20,13 @@ class FavoritoController extends Controller
             return response()->json(["respuesta" => false, "mensaje" => 'El usuario no existe'], 200);
 
         $favoritos = Proyecto::query()
-            ->select('id', 'uuid', 'titulo', 'estudiante_id')
-            ->addSelect(['agregado_el' => Favorito::select('fecha_agregacion')
+            ->select('id', 'uuid', 'titulo', 'usuario_id')
+            ->addSelect(['agregado_el' => Favorito::select('created_at')
                 ->whereColumn('proyecto_id', 'proyectos.id')
                 ->where('usuario_id', $usuario->id)
                 ->take(1)
             ])
-            ->with('estudiante:id,apellidos,nombres,avatar', 'estudiante.usuario:usuario,estudiante_id', 'portada:id,link_imagen,proyecto_id')
+            ->with('usuario:id,usuario,avatar,estudiante_id', 'usuario.estudiante:id,apellidos,nombres', 'portada:id,link_imagen,proyecto_id')
             ->whereHas('favoritos', function ($query) use ($usuario) {
                 $query->where('usuario_id', $usuario->id);
             })

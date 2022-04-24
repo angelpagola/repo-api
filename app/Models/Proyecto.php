@@ -10,12 +10,12 @@ class Proyecto extends Model
     use HasFactory;
 
     protected $table = 'proyectos';
-    public $timestamps = false;
-    public $fillable = ['uuid', 'titulo', 'resumen', 'fecha_publicacion', 'estudiante_id'];
+//    public $timestamps = false;
+    public $fillable = ['uuid', 'titulo', 'resumen', 'usuario_id'];
 
-    public function estudiante()
+    public function usuario()
     {
-        return $this->belongsTo(Estudiante::class);
+        return $this->belongsTo(Usuario::class);
     }
 
     public function tags()
@@ -33,7 +33,7 @@ class Proyecto extends Model
         return $this->hasOne(ProyectoImagen::class);
     }
 
-    public function proyectoArchivo()
+    public function archivos()
     {
         return $this->hasMany(ProyectoArchivo::class);
     }

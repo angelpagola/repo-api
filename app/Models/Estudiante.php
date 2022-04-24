@@ -11,7 +11,7 @@ class Estudiante extends Model
 
     protected $table = 'estudiantes';
     public $timestamps = false;
-    public $fillable = ['uuid', 'nombres', 'apellidos', 'correo', 'telefono', 'linkedin', 'avatar', 'escuela_id'];
+    public $fillable = ['nombres', 'apellidos', 'correo', 'telefono', 'linkedin', 'escuela_id'];
 
     public function escuela()
     {
@@ -21,10 +21,5 @@ class Estudiante extends Model
     public function usuario()
     {
         return $this->hasOne(Usuario::class);
-    }
-
-    public function proyecto()
-    {
-        return $this->hasMany(Proyecto::class);
     }
 }

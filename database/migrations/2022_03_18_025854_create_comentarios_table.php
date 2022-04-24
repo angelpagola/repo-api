@@ -14,13 +14,14 @@ return new class extends Migration {
     {
         Schema::create('comentarios', function (Blueprint $table) {
             $table->id();
-            $table->string('mensaje', 200);
+            $table->string('mensaje');
             $table->foreignId('usuario_id')->constrained('usuarios')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
             $table->foreignId('proyecto_id')->constrained('proyectos')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
+            $table->timestamps();
         });
     }
 

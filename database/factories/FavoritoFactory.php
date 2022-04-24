@@ -18,10 +18,12 @@ class FavoritoFactory extends Factory
      */
     public function definition()
     {
+        $fecha = $this->faker->dateTimeBetween('-16 months', 'now');
         return [
-            'fecha_agregacion' => $this->faker->dateTimeBetween('-4 months', 'now')->format("Y-m-d"),
             'proyecto_id' => Proyecto::inRandomOrder()->first()->id,
             'usuario_id' => Usuario::inRandomOrder()->first()->id,
+            'created_at' => $fecha,
+            'updated_at' => $fecha,
         ];
     }
 }

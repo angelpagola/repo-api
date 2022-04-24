@@ -23,6 +23,7 @@ use Illuminate\Support\Str;
 
 class ProyectoController extends Controller
 {
+    // TODO: Ok
     public function index(Request $request, $usuario)
     {
         $user = Usuario::query()->where('usuario', $usuario)->first();
@@ -31,38 +32,39 @@ class ProyectoController extends Controller
         if (!$user) {
             return response()->json([
                 'respuesta' => false,
-                'mensaje' => 'No existe ningún usuario con este id en el sistema.'
-            ], 200);
+                'mensaje' => 'No existe ningún usuario con este nombre en el sistema.'
+            ]);
         }
 
         $proyecto = Proyecto::query()
-            ->select('id', 'uuid', 'titulo', 'fecha_publicacion', 'estudiante_id')
-            ->with('estudiante:id,apellidos,nombres,avatar', 'estudiante.usuario:id,usuario,estudiante_id', 'portada:id,link_imagen,proyecto_id')
+            ->select('id', 'titulo', 'created_at', 'usuario_id')
+            ->with('usuario:id,usuario,avatar', 'portada:id,link_imagen,proyecto_id')
             ->with(['tags' => function ($query) {
                 $query->limit(4);
             }])
             ->where('titulo', 'like', '%' . $search . '%')
-            ->where('estudiante_id', $user->estudiante_id)
-            ->orderBy('fecha_publicacion', 'desc')
+            ->where('usuario_id', $user->id)
+            ->orderBy('created_at', 'desc')
             ->get();
 
         if (count($proyecto)) {
             return response()->json([
                 'respuesta' => true,
                 'mensaje' => $proyecto
-            ], 200);
+            ]);
         } else {
             return response()->json([
                 'respuesta' => false,
                 'mensaje' => 'No se encontró ningún proyecto.'
-            ], 200);
+            ]);
         }
     }
 
+    // TODO: Ok
     public function show($proyecto_id)
     {
         $proyecto = Proyecto::query()
-            ->with('estudiante', 'estudiante.usuario', 'estudiante.escuela', 'tags', 'portadas', 'proyectoArchivo')
+            ->with('usuario', 'usuario.estudiante', 'usuario.estudiante.escuela', 'tags', 'portadas', 'archivos')
             ->with(['reportes' => function ($query) {
                 $query->select('usuario_id', 'proyecto_id')->orderBy('motivo_id');
             }])
@@ -91,10 +93,7 @@ class ProyectoController extends Controller
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            return response()->json([
-                'respuesta' => false,
-                'mensaje' => 'Error de validación', 'error' => $validator->errors()
-            ], 200);
+            return response()->json(['respuesta' => false, 'mensaje' => 'Error de validación', 'error' => $validator->errors()]);
         }
 
         $usuario = Usuario::find($request->usuario_id);
@@ -103,12 +102,14 @@ class ProyectoController extends Controller
             'uuid' => Str::uuid(),
             'titulo' => $request->titulo,
             'resumen' => $request->resumen,
-            'fecha_publicacion' => now()->format('Y-m-d'),
-            'estudiante_id' => $usuario->estudiante_id
+            'usuario_id' => $usuario->id,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         $tags_id = [];
         foreach ($request->tags as $tag) {
+            $tag = substr($tag, 0, 30);
             $tag_exists = Tag::query()->where('nombre', $tag)->first();
             if (!$tag_exists) {
                 $tag_exists = Tag::create(['nombre' => $tag]);
@@ -138,18 +139,18 @@ class ProyectoController extends Controller
         if (!Storage::exists($rutaDocumentos)) {
             Storage::makeDirectory($rutaDocumentos);
         }
-        $documentos_ids = [];
+        $docs = [];
         foreach ($request->documentos as $documento) {
             $nombreDoc = 'repotweb_' . time() . rand(1, 99) . '.' . $documento->getClientOriginalExtension();
             $link_doc = asset($urlDocumentos . $nombreDoc);
             $documento->storeAs($rutaDocumentos, $nombreDoc);
-            $documentos_ids[] = ["link_archivo" => $link_doc, "proyecto_id" => $proyecto->id];
+            $docs[] = ["nombre" => $nombreDoc, "link_archivo" => $link_doc, "proyecto_id" => $proyecto->id];
         }
-        ProyectoArchivo::insert($documentos_ids);
+        ProyectoArchivo::insert($docs);
 
         return response()->json([
             'respuesta' => true,
-            'mensaje' => 'Registro Creado Correctamente'
+            'mensaje' => 'Registro creado correctamente'
         ], 201);
     }
 
@@ -243,10 +244,11 @@ class ProyectoController extends Controller
         ], 200);
     }
 
+    // TODO: Ok
     public function recomendados($proyecto_id)
     {
         $proyectos = Proyecto::query()
-            ->select('id', 'titulo', 'estudiante_id')
+            ->select('id', 'titulo', 'usuario_id')
             ->addSelect([
                 'similitud' => ProyectoTag::select(DB::raw('count(*)'))
                     ->whereColumn('proyecto_id', 'proyectos.id')
@@ -255,10 +257,10 @@ class ProyectoController extends Controller
                     })
                     ->take(1)
             ])
-            ->with('portada', 'estudiante:id', 'estudiante.usuario:usuario,estudiante_id')
+            ->with('portada', 'usuario:id,usuario')
             ->having('id', '<>', $proyecto_id)
             ->orderBy('similitud', 'desc')
-            ->orderBy('fecha_publicacion', 'desc')
+            ->orderBy('created_at', 'desc')
             ->limit(3)
             ->get();
 
@@ -280,6 +282,7 @@ class ProyectoController extends Controller
         }
     }
 
+    // TODO: Ok
     public function valoracion($proyecto_id, $usuario_id)
     {
         $proyecto = Proyecto::query()
@@ -297,6 +300,7 @@ class ProyectoController extends Controller
         return response()->json([], 204);
     }
 
+    // TODO: Ok
     // Para agregar o quitar un proyecto a Favoritos
     public function agregarAFav($proy_id, $user_id)
     {
@@ -313,6 +317,7 @@ class ProyectoController extends Controller
         }
     }
 
+    // TODO: Ok
     //Saber si un proyecto esta en los favoritos de un usuario
     public function favorito($proyecto_id, $usuario_id)
     {
@@ -325,13 +330,13 @@ class ProyectoController extends Controller
         return response()->json(["es_favorito" => (bool)$proyecto], 200);
     }
 
+    // TODO: Ok
     // Obtener los datos basicos del usuario: avatar, nombres, contacto
     public function datosUsuario($usuario)
     {
         $user = Usuario::query()
-            ->with(['estudiante' => function ($query) {
-                $query->withCount('proyecto');
-            }, 'estudiante.escuela'])
+            ->with('estudiante', 'estudiante.escuela')
+            ->withCount('proyectos')
             ->where('usuario', $usuario)->first();
 
         if (!$user) {
@@ -402,11 +407,11 @@ class ProyectoController extends Controller
 
     }
 
+    // TODO: Ok
     // Lista de motivos para reportar un proyecto
     public function motivos()
     {
         $motivos = Motivo::query()->orderBy('nombre')->get();
-
         return response()->json($motivos, 200);
     }
 }

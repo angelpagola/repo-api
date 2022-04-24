@@ -28,7 +28,7 @@ Route::prefix('/usuario')->controller(UsuarioController::class)->group(function 
     Route::get('/perfil/{usuario_id}', 'show')->name('usuario.show');
     Route::get('/perfil/avatar/{usuario_id}', 'avatar')->name('usuario.avatar');
     Route::get('/perfil/interes/{usuario_id}', 'interes')->name('usuario.interes');
-    Route::put('/perfil/update/{usuario}', 'usuarioUpdate')->name('usuario.update');
+    Route::post('/perfil/update/{usuario}', 'usuarioUpdate')->name('usuario.update');
     Route::post('/perfil/avatar/update/{usuario}', 'avatarUpdate')->name('usuario.avatar.update');
     Route::delete('/perfil/interes/{tag_id}', 'interesDelete')->name('usuario.interes.delete');
 });

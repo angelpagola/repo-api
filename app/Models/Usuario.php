@@ -10,8 +10,8 @@ class Usuario extends Model
     use HasFactory;
 
     protected $table = 'usuarios';
-    public $timestamps = false;
-    protected $fillable = ['uuid', 'usuario', 'password', 'activo', 'estudiante_id'];
+//    public $timestamps = false;
+    protected $fillable = ['uuid', 'usuario', 'password', 'activo', 'avatar', 'estudiante_id'];
 
     protected $hidden = ['password'];
 
@@ -20,12 +20,17 @@ class Usuario extends Model
         return $this->belongsTo(Estudiante::class);
     }
 
+    public function proyectos()
+    {
+        return $this->hasMany(Proyecto::class)->orderBy('created_at', 'desc');
+    }
+
     public function valoracion()
     {
         return $this->belongsToMany(Proyecto::class, 'valoraciones');
     }
 
-    public function proyectos()
+    public function favoritos()
     {
         return $this->belongsToMany(Proyecto::class, 'favoritos')->withPivot('fecha_agregacion');
     }
@@ -38,7 +43,7 @@ class Usuario extends Model
     //Es similar a la function tag()
     public function intereses()
     {
-        return $this->belongsToMany(Tag::class, 'tema_interes')->withPivot('id');
+        return $this->belongsToMany(Tag::class, 'tema_interes')->orderBy('nombre')->withPivot('id');
     }
 
     public function comentario()

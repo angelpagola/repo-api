@@ -19,6 +19,7 @@ class ProyectoArchivoFactory extends Factory
     {
         $ruta = 'storage/proyectos/documentos/';
         return [
+            'nombre' => 'archivo_'.$this->faker->uuid(),
             'link_archivo' => asset($ruta . $this->faker->image('public/storage/proyectos/documentos', 640, 480, null, false)),
             'proyecto_id' => Proyecto::inRandomOrder()->first()->id
         ];

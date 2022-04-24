@@ -10,6 +10,6 @@ class Favorito extends Model
     use HasFactory;
 
     protected $table = 'favoritos';
-    public $timestamps = false;
-    public $fillable = ['fecha_agregacion', 'usuario_id', 'proyecto_id'];
+//    public $timestamps = false;
+    public $fillable = ['usuario_id', 'proyecto_id'];
 }

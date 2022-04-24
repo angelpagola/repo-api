@@ -14,13 +14,11 @@ return new class extends Migration {
     {
         Schema::create('estudiantes', function (Blueprint $table) {
             $table->id();
-            $table->string('uuid', 40);
             $table->string('nombres', 40);
             $table->string('apellidos', 40);
             $table->string('correo', 100)->unique()->nullable();
             $table->string('telefono', 9)->unique()->nullable();
-            $table->string('linkedin', 100)->unique()->nullable();
-            $table->string('avatar')->nullable();
+            $table->string('linkedin')->unique()->nullable();
             $table->foreignId('escuela_id')->constrained('escuelas')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();

@@ -18,9 +18,11 @@ return new class extends Migration {
             $table->string('usuario', 25)->unique();
             $table->string('password', 65);
             $table->boolean('activo')->default(true);
+            $table->string('avatar')->nullable();
             $table->foreignId('estudiante_id')->constrained('estudiantes')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
+            $table->timestamps();
         });
     }
 
