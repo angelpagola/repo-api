@@ -46,6 +46,27 @@ class UsuarioController extends Controller
         ]);
     }
 
+    public function logout()
+    {
+        $usuario = auth()->user();
+        if ($usuario) {
+            $usuario->tokens->each(function ($token, $key) {
+                $token->delete();
+            });
+            $usuario->save();
+            return response()->json([
+                'respuesta' => true,
+                'mensaje' => 'Se cerró sesión correctamente de todo los dispositivos'
+            ], 200);
+        } else {
+            return response()->json([
+                'respuesta' => false,
+                'mensaje' => 'No existe ningún usuario registrado en el sistema.'
+            ], 200);
+        }
+
+    }
+
     // TODO: Ok
     public function signup(Request $request)
     {
