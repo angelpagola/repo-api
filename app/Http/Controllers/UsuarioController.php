@@ -37,10 +37,34 @@ class UsuarioController extends Controller
             ]);
         }
 
+        $accessToken = $usuario->createToken('authToken')->accessToken;
+
         return response()->json([
             'respuesta' => true,
-            'mensaje' => $callback->select('id', 'usuario', 'avatar', 'estudiante_id')->with('estudiante:id,nombres,apellidos')->first()
+            'mensaje' => $callback->select('id', 'usuario', 'avatar', 'estudiante_id')->with('estudiante:id,nombres,apellidos')->first(),
+            'accessToken' => $accessToken
         ]);
+    }
+
+    public function logout()
+    {
+        $usuario = auth()->user();
+        if ($usuario) {
+            $usuario->tokens->each(function ($token, $key) {
+                $token->delete();
+            });
+            $usuario->save();
+            return response()->json([
+                'respuesta' => true,
+                'mensaje' => 'Se cerró sesión correctamente de todo los dispositivos'
+            ], 200);
+        } else {
+            return response()->json([
+                'respuesta' => false,
+                'mensaje' => 'No existe ningún usuario registrado en el sistema.'
+            ], 200);
+        }
+
     }
 
     // TODO: Ok
@@ -90,13 +114,16 @@ class UsuarioController extends Controller
             'estudiante_id' => $estudiante->id
         ]);
 
+        $accessToken = $usuario->createToken('authToken')->accessToken;
+
         $usuario->intereses()->attach($request->tags);
 
         return response()->json([
             'respuesta' => true,
             'mensaje' => Usuario::query()
                 ->select("id", "usuario", "estudiante_id", "avatar")
-                ->with('estudiante:id,nombres,apellidos')->find($usuario->id)
+                ->with('estudiante:id,nombres,apellidos')->find($usuario->id),
+            'accessToken' => $accessToken
         ], 201);
     }
 
